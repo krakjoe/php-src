@@ -94,7 +94,7 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update
+    - script: sudo apt-get update -y | true
       displayName: "APT UPDATE"
     - script: sudo apt install $(packages)
       displayName: "APT INSTALL"
@@ -117,7 +117,7 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update
+    - script: sudo apt-get update | true
       displayName: "APT UPDATE"
     - script: sudo apt install $(packages)
       displayName: "APT INSTALL"
@@ -140,7 +140,7 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update
+    - script: sudo apt-get update | true
       displayName: "APT UPDATE"
     - script: sudo apt install $(packages)
       displayName: "APT INSTALL"
@@ -163,7 +163,7 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update
+    - script: sudo apt-get update | true
       displayName: "APT UPDATE"
     - script: sudo apt install $(packages)
       displayName: "APT INSTALL"
