@@ -100,7 +100,7 @@ jobs:
       displayName: "APT INSTALL"
     - script: ./buildconf --force
       displayName: "BUILDCONF"
-    - script: ./configure $(configuration) --disable-debug --disable-zts
+    - script: ./configure --disable-debug --disable-zts $(configuration)
       displayName: "CONFIGURE"
     - script: make -j$(/usr/bin/nproc)
       displayName: "MAKE"
@@ -118,7 +118,7 @@ jobs:
       displayName: "APT INSTALL"
     - script: ./buildconf --force
       displayName: "BUILDCONF"
-    - script: ./configure $(configuration) --enable-debug --disable-zts
+    - script: ./configure --enable-debug --disable-zts $(configuration)
       displayName: "CONFIGURE"
     - script: make -j$(/usr/bin/nproc)
       displayName: "MAKE"
@@ -136,7 +136,7 @@ jobs:
       displayName: "APT INSTALL"
     - script: ./buildconf --force
       displayName: "BUILDCONF"
-    - script: ./configure $(configuration) --disable-debug --enable-zts
+    - script: ./configure --disable-debug --enable-zts $(configuration)
       displayName: "CONFIGURE"
     - script: make -j$(/usr/bin/nproc)
       displayName: "MAKE"
@@ -154,11 +154,11 @@ jobs:
       displayName: "APT INSTALL"
     - script: ./buildconf --force
       displayName: "BUILDCONF"
-    - script: ./configure $(configuration) --enable-debug --enable-zts
+    - script: ./configure --enable-debug --enable-zts $(configuration)
       displayName: "CONFIGURE"
     - script: make -j$(/usr/bin/nproc)
       displayName: "MAKE"
     - script: sudo make install
       displayName: "INSTALL"
     - script: $(run)
-      displayName: TEST
+      displayName: "TEST"
