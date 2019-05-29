@@ -2,6 +2,32 @@ trigger:
   - master
 
 variables:
+  packages: bison \
+            re2c \
+            locales \
+            language-pack-de \
+            re2c \
+            libgmp-dev \
+            libicu-dev \
+            libtidy-dev \
+            libenchant-dev \
+            libaspell-dev \
+            libpspell-dev \
+            librecode-dev \
+            libsasl2-dev \
+            libxpm-dev \
+            libzip-dev \
+            libsqlite3-dev \
+            libwebp-dev \
+            libonig-dev \
+            libkrb5-dev \
+            libgssapi-krb5-2 \
+            libcurl4-openssl-dev \
+            libxml2-dev \
+            libxslt1-dev \
+            libpq-dev \
+            libreadline-dev
+
   configuration: --prefix=/usr \
                  --enable-phpdbg \
                  --enable-fpm \
@@ -60,80 +86,63 @@ variables:
        --show-slow 1000 \
        --set-timeout 120
 
-stages:
-  - stage: APT
-    jobs:
-      - job:
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-        - script: sudo apt-get update
-        - script: |
-            sudo apt-get install  bison \
-                                  re2c \
-                                  locales \
-                                  language-pack-de \
-                                  re2c \
-                                  libgmp-dev \
-                                  libicu-dev \
-                                  libtidy-dev \
-                                  libenchant-dev \
-                                  libaspell-dev \
-                                  libpspell-dev \
-                                  librecode-dev \
-                                  libsasl2-dev \
-                                  libxpm-dev \
-                                  libzip-dev \
-                                  libsqlite3-dev \
-                                  libwebp-dev \
-                                  libonig-dev \
-                                  libkrb5-dev \
-                                  libgssapi-krb5-2 \
-                                  libcurl4-openssl-dev \
-                                  libxml2-dev \
-                                  libxslt1-dev \
-                                  libpq-dev \
-                                  libreadline-dev
-  - stage: BUILDCONF
-    dependsOn: APT
-    jobs:
-      - job:
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-        - script: ./buildconf --force
-  - stage: BUILD
-    dependsOn: BUILDCONF
-    jobs:
-      - job: NO_DEBUG_NO_ZTS
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-        - script: ./configure $(configuration) --disable-debug --disable-zts
-        - script: make -j$(/usr/bin/nproc)
-        - script: sudo make install
-        - script: $(run)
-      - job: DEBUG_NO_ZTS
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-        - script: ./configure $(configuration) --enable-debug --disable-zts
-        - script: make -j$(/usr/bin/nproc)
-        - script: sudo make install
-        - script: $(run)
-      - job: NO_DEBUG_ZTS
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-        - script: ./configure $(configuration) --disable-debug --enable-zts
-        - script: make -j$(/usr/bin/nproc)
-        - script: sudo make install
-        - script: $(run)
-      - job: DEBUG_ZTS
-        pool:
-          vmImage: "ubuntu-latest"
-        steps:
-        - script: ./configure $(configuration) --enable-debug --enable-zts
-        - script: make -j$(/usr/bin/nproc)
-        - script: sudo make install
-        - script: $(run)
+jobs:
+  - job: NO_DEBUG_NO_ZTS
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+    - script: sudo apt-get update && sudo apt install $(packages)
+      displayName: APT
+    - script: ./buildconf --force && \
+              ./configure $(configuration) --disable-debug --disable-zts
+      displayName: CONFIGURE
+    - script: make -j$(/usr/bin/nproc) && \
+      displayName: MAKE
+    - script: sudo make install
+      displayName: INSTALL
+    - script: $(run)
+  - job: DEBUG_NO_ZTS
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+    - script: sudo apt-get update && sudo apt install $(packages)
+      displayName: APT
+    - script: ./buildconf --force && \
+              ./configure $(configuration) --enable-debug --disable-zts
+      displayName: CONFIGURE
+    - script: make -j$(/usr/bin/nproc)
+      displayName: MAKE
+    - script: sudo make install
+      displayName: INSTALL
+    - script: $(run)
+      displayName: TEST
+  - job: NO_DEBUG_ZTS
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+    - script: sudo apt-get update && sudo apt install $(packages)
+      displayName: APT
+    - script: ./buildconf --force && \
+              ./configure $(configuration) --disable-debug --enable-zts
+      displayName: CONFIGURE
+    - script: make -j$(/usr/bin/nproc)
+      displayName: MAKE
+    - script: sudo make install
+      displayName: INSTALL
+    - script: $(run)
+      displayName: TEST
+  - job: DEBUG_ZTS
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+    - script: sudo apt-get update && sudo apt install $(packages)
+      displayName: APT
+    - script: ./buildconf --force && \
+              ./configure $(configuration) --enable-debug --enable-zts
+      displayName: CONFIGURE
+    - script: make -j$(/usr/bin/nproc)
+      displayName: MAKE
+    - script: sudo make install
+      displayName: INSTALL
+    - script: $(run)
+      displayName: TEST
