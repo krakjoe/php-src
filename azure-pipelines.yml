@@ -91,22 +91,27 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update && sudo apt install $(packages)
-      displayName: APT
+    - script: sudo apt-get update
+      displayName: APT UPDATE
+    - script: sudo apt install $(packages)
+      displayName: APT INSTALL
     - script: ./buildconf --force && \
               ./configure $(configuration) --disable-debug --disable-zts
       displayName: CONFIGURE
-    - script: make -j$(/usr/bin/nproc) && \
+    - script: make -j$(/usr/bin/nproc)
       displayName: MAKE
     - script: sudo make install
       displayName: INSTALL
     - script: $(run)
+      displayName: TEST
   - job: DEBUG_NO_ZTS
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update && sudo apt install $(packages)
-      displayName: APT
+    - script: sudo apt-get update
+      displayName: APT UPDATE
+    - script: sudo apt install $(packages)
+      displayName: APT INSTALL
     - script: ./buildconf --force && \
               ./configure $(configuration) --enable-debug --disable-zts
       displayName: CONFIGURE
@@ -120,8 +125,10 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update && sudo apt install $(packages)
-      displayName: APT
+    - script: sudo apt-get update
+      displayName: APT UPDATE
+    - script: sudo apt install $(packages)
+      displayName: APT INSTALL
     - script: ./buildconf --force && \
               ./configure $(configuration) --disable-debug --enable-zts
       displayName: CONFIGURE
@@ -135,8 +142,10 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-    - script: sudo apt-get update && sudo apt install $(packages)
-      displayName: APT
+    - script: sudo apt-get update
+      displayName: APT UPDATE
+    - script: sudo apt install $(packages)
+      displayName: APT INSTALL
     - script: ./buildconf --force && \
               ./configure $(configuration) --enable-debug --enable-zts
       displayName: CONFIGURE
