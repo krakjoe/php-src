@@ -80,14 +80,14 @@ variables:
     --with-config-file-scan-dir=/etc/php.d
   
   run: |
-    REPORT_EXIT_STATUS=1 php run-tests.php -P \
-                                           -j$(/usr/bin/nproc) \
-                                           -q \
-                                           -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" \
-                                           --offline \
-                                           --show-diff \
-                                           --show-slow 1000 \
-                                           --set-timeout 120
+    REPORT_EXIT_STATUS=1 TEST_PHP_JUNIT=junit.xml php run-tests.php -P \
+                                                                    -j$(/usr/bin/nproc) \
+                                                                    -q \
+                                                                    -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" \
+                                                                    --offline \
+                                                                    --show-diff \
+                                                                    --show-slow 1000 \
+                                                                    --set-timeout 120
 
 jobs:
   - job: NO_DEBUG_NO_ZTS
@@ -108,6 +108,11 @@ jobs:
       displayName: "INSTALL"
     - script: $(run)
       displayName: "TEST"
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'junit.xml'
+        testRunTitle: 'PHP Test Suite'
   - job: DEBUG_NO_ZTS
     pool:
       vmImage: "ubuntu-latest"
@@ -126,6 +131,11 @@ jobs:
       displayName: "INSTALL"
     - script: $(run)
       displayName: "TEST"
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'junit.xml'
+        testRunTitle: 'PHP Test Suite'
   - job: NO_DEBUG_ZTS
     pool:
       vmImage: "ubuntu-latest"
@@ -144,6 +154,11 @@ jobs:
       displayName: "INSTALL"
     - script: $(run)
       displayName: "TEST"
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'junit.xml'
+        testRunTitle: 'PHP Test Suite'
   - job: DEBUG_ZTS
     pool:
       vmImage: "ubuntu-latest"
@@ -162,3 +177,8 @@ jobs:
       displayName: "INSTALL"
     - script: $(run)
       displayName: "TEST"
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'junit.xml'
+        testRunTitle: 'PHP Test Suite'
