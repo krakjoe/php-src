@@ -37,7 +37,8 @@ steps:
                           libgssapi-krb5-2 \
                           libcurl4-openssl-dev \
                           libxml2-dev \
-                          libpq-dev
+                          libpq-dev \
+                          libedit-dev
   displayName: 'Install APT Packages'
 
 - script: |
