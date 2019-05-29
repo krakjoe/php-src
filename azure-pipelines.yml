@@ -1,0 +1,90 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    sudo apt-get install  locales \
+                          language-pack-de \
+                          re2c \
+                          libgmp-dev \
+                          libicu-dev \
+                          libtidy-dev \
+                          libenchant-dev \
+                          libaspell-dev \
+                          libpspell-dev \
+                          librecode-dev \
+                          libsasl2-dev \
+                          libxpm-dev \
+                          libt1-dev \
+                          libzip-dev
+  displayName: 'Install Pre-requisites'
+
+- script: |
+    ./buildconf --force
+  displayName: 'Build Configure Script'
+
+- script: |
+    ./configure --prefix=/usr \
+                --enable-phpdbg \
+                --enable-fpm \
+                --with-pdo-mysql=mysqlnd \
+                --with-mysqli=mysqlnd \
+                --with-pgsql \
+                --with-pdo-pgsql \
+                --with-pdo-sqlite \
+                --enable-intl \
+                --without-pear \
+                --with-gd \
+                --with-jpeg-dir=/usr \
+                --with-png-dir=/usr \
+                --enable-exif \
+                --enable-zip \
+                --without-libzip \
+                --with-zlib \
+                --with-zlib-dir=/usr \
+                --enable-soap \
+                --enable-xmlreader \
+                --with-xsl \
+                --with-curl=/usr \
+                --with-tidy \
+                --with-xmlrpc \
+                --enable-sysvsem \
+                --enable-sysvshm \
+                --enable-shmop \
+                --enable-pcntl \
+                --with-readline \
+                --enable-mbstring \
+                --with-curl \
+                --with-gettext \
+                --enable-sockets \
+                --with-bz2 \
+                --with-openssl \
+                --with-gmp \
+                --enable-bcmath \
+                --enable-calendar \
+                --enable-ftp \
+                --with-pspell=/usr \
+                --with-enchant=/usr \
+                --enable-wddx \
+                --with-freetype-dir=/usr \
+                --with-xpm-dir=/usr \
+                --with-kerberos \
+                --enable-sysvmsg \
+                --enable-zend-test=shared
+  displayName: "Configure Build"
+
+- script: |
+    make -j4
+  displayName: "Build"
+
+- script: |
+    make install
+  displayName: "Install"
