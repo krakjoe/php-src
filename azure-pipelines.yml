@@ -1,0 +1,36 @@
+trigger:
+  - master
+
+jobs:
+  - template: azure/job.yml
+    parameters:
+      configurationName: RELEASE_NTS
+      configurationParameters: '--disable-debug --disable-zts'
+      runTestsName: 'Release (NTS)'
+  - template: azure/job.yml
+    parameters:
+      configurationName: DEBUG_NTS
+      configurationParameters: '--enable-debug --disable-zts'
+      runTestsName: 'Debug (NTS)'
+  - template: azure/job.yml
+    parameters:
+      configurationName: DEBUG_NTS_JIT
+      configurationParameters: '--enable-debug --disable-zts'
+      runTestsName: 'Debug (NTS JIT)'
+      runTestsParameters: -dopcache.jit_buffer_size=16M -dopcache.enable_cli=1
+  - template: azure/job.yml
+    parameters:
+      configurationName: RELEASE_ZTS
+      configurationParameters: '--disable-debug --enable-zts'
+      runTestsName: 'Release (ZTS)'
+  - template: azure/job.yml
+    parameters:
+      configurationName: DEBUG_ZTS
+      configurationParameters: '--enable-debug --enable-zts'
+      runTestsName: 'Debug (ZTS)'
+  - template: azure/job.yml
+    parameters:
+      configurationName: DEBUG_ZTS_JIT
+      configurationParameters: '--enable-debug --enable-zts'
+      runTestsName: 'Debug (ZTS JIT)'
+      runTestsParameters: -dopcache.jit_buffer_size=16M -dopcache.enable_cli=1

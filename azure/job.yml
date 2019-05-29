@@ -1,0 +1,142 @@
+parameters:
+  configurationName: ''
+  configurationParameters: ''
+  runTestsName: ''
+  runTestsParameters: ''
+  runTestsTimeout: '120'
+  runTestsDisplayGroups: 'FAIL,XFAIL,BORK,WARN,LEAK,XLEAK,SKIP'
+  runTestsOutput: 'junit.xml'
+
+jobs:
+  - job: ${{ parameters.configurationName }}
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+      fetchDepth: 1
+    - script: sudo apt-get update -y | true
+      displayName: "APT UPDATE SOURCES"
+    - script: |
+          sudo apt install bison \
+                           re2c \
+                           locales \
+                           language-pack-de \
+                           re2c \
+                           libgmp-dev \
+                           libicu-dev \
+                           libtidy-dev \
+                           libenchant-dev \
+                           libaspell-dev \
+                           libpspell-dev \
+                           librecode-dev \
+                           libsasl2-dev \
+                           libxpm-dev \
+                           libzip-dev \
+                           libsqlite3-dev \
+                           libwebp-dev \
+                           libonig-dev \
+                           libkrb5-dev \
+                           libgssapi-krb5-2 \
+                           libcurl4-openssl-dev \
+                           libxml2-dev \
+                           libxslt1-dev \
+                           libpq-dev \
+                           libreadline-dev \
+                           postgresql \
+                           postgresql-contrib \
+                           daemon
+      displayName: "APT INSTALL PACKAGES"
+    - script: ./buildconf --force
+      displayName: "CONFIGURE GENERATION"
+    - script: |
+        ./configure ${{ parameters.configurationParameters }} \
+            --prefix=/usr \
+            --enable-phpdbg \
+            --enable-fpm \
+            --with-pdo-mysql=mysqlnd \
+            --with-mysqli=mysqlnd \
+            --with-pgsql \
+            --with-pdo-pgsql \
+            --with-pdo-sqlite \
+            --enable-intl \
+            --without-pear \
+            --enable-gd \
+            --with-jpeg \
+            --with-webp \
+            --with-freetype \
+            --with-xpm \
+            --enable-exif \
+            --with-zip \
+            --with-zlib \
+            --with-zlib-dir=/usr \
+            --enable-soap \
+            --enable-xmlreader \
+            --with-xsl \
+            --with-tidy \
+            --with-xmlrpc \
+            --enable-sysvsem \
+            --enable-sysvshm \
+            --enable-shmop \
+            --enable-pcntl \
+            --with-readline \
+            --enable-mbstring \
+            --with-curl \
+            --with-gettext \
+            --enable-sockets \
+            --with-bz2 \
+            --with-openssl \
+            --with-gmp \
+            --enable-bcmath \
+            --enable-calendar \
+            --enable-ftp \
+            --with-pspell=/usr \
+            --with-enchant=/usr \
+            --with-kerberos \
+            --enable-sysvmsg \
+            --with-ffi \
+            --enable-zend-test=shared \
+            --enable-werror \
+            --with-config-file-path=/etc \
+            --with-config-file-scan-dir=/etc/php.d
+      displayName: "CONFIGURE"
+    - script: make -j$(/usr/bin/nproc) >/dev/null
+      displayName: "MAKE BUILD"
+    - script: |
+        sudo make install
+      displayName: "INSTALL BUILD"
+    - script: |
+        sudo mkdir     /etc/php.d
+        sudo chmod 777 /etc/php.d
+        echo mysqli.default_socket=/var/run/mysqld/mysqld.sock     > /etc/php.d/mysqli.ini
+        echo pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock  > /etc/php.d/pdo_mysql.ini
+      displayName: "INSTALL CONFIGURATION FILES"
+    - script: |
+        mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS test"
+      displayName: "SETUP MYSQL"
+    - script: |
+        echo '<?php $conn_str .= " user=postgres"; ?>' >> ext/pgsql/tests/config.inc
+      displayName: "SETUP PGSQL"
+    - script: |
+        export MYSQL_TEST_USER=root
+        export MYSQL_TEST_PASSWD=root
+        export PDO_MYSQL_TEST_USER=root
+        export PDO_MYSQL_TEST_PASS=root
+        export PDO_PGSQL_TEST_DSN='pgsql:host=localhost port=5432 dbname=test user=postgres password='
+        export TEST_PHP_JUNIT=${{ parameters.runTestsOutput }}
+        export REPORT_EXIT_STATUS=no
+        export SKIP_IO_CAPTURE_TESTS=1
+        php run-tests.php -P -q \
+            -j$(/usr/bin/nproc) \
+            -g ${{ parameters.runTestsDisplayGroups }} \
+            --offline \
+            --show-slow 1000 \
+            --set-timeout ${{ parameters.runTestsTimeout }} \
+            ${{ parameters.runTestsParameters }}
+      displayName: "TEST BUILD"
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: ${{ parameters.runTestsOutput }}
+        testRunTitle: ${{ parameters.runTestsName }}
+        failTaskOnFailedTests: true
+      displayName: "EXPORT JUNIT"
