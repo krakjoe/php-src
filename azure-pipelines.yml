@@ -23,7 +23,6 @@ steps:
                           librecode-dev \
                           libsasl2-dev \
                           libxpm-dev \
-                          libt1-dev \
                           libzip-dev
   displayName: 'Install Pre-requisites'
 
