@@ -38,7 +38,7 @@ steps:
                           libcurl4-openssl-dev \
                           libxml2-dev \
                           libpq-dev \
-                          libedit-dev
+                          libreadline-dev
   displayName: 'Install APT Packages'
 
 - script: |
