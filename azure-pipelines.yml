@@ -15,7 +15,9 @@ steps:
   displayName: "APT Update"
 
 - script: |
-    sudo apt-get install  locales \
+    sudo apt-get install  bison \
+                          re2c \
+                          locales \
                           language-pack-de \
                           re2c \
                           libgmp-dev \
@@ -28,8 +30,9 @@ steps:
                           libsasl2-dev \
                           libxpm-dev \
                           libzip-dev \
-                          bison \
-                          re2c
+                          libsqlite3-dev \
+                          libwebp-dev \
+                          libonig-dev
   displayName: 'Install APT Packages'
 
 - script: |
@@ -47,18 +50,18 @@ steps:
                 --with-pdo-sqlite \
                 --enable-intl \
                 --without-pear \
-                --with-gd \
-                --with-jpeg-dir=/usr \
-                --with-png-dir=/usr \
+                --enable-gd \
+                --with-jpeg \
+                --with-webp \
+                --with-freetype \
+                --with-xpm \
                 --enable-exif \
                 --enable-zip \
-                --without-libzip \
                 --with-zlib \
                 --with-zlib-dir=/usr \
                 --enable-soap \
                 --enable-xmlreader \
                 --with-xsl \
-                --with-curl=/usr \
                 --with-tidy \
                 --with-xmlrpc \
                 --enable-sysvsem \
@@ -78,12 +81,11 @@ steps:
                 --enable-ftp \
                 --with-pspell=/usr \
                 --with-enchant=/usr \
-                --enable-wddx \
-                --with-freetype-dir=/usr \
-                --with-xpm-dir=/usr \
                 --with-kerberos \
                 --enable-sysvmsg \
-                --enable-zend-test=shared
+                --with-ffi \
+                --enable-zend-test=shared \
+                --enable-werror
   displayName: "Configure Build"
 
 - script: |
