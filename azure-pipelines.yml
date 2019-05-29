@@ -27,7 +27,9 @@ steps:
                           librecode-dev \
                           libsasl2-dev \
                           libxpm-dev \
-                          libzip-dev
+                          libzip-dev \
+                          bison \
+                          re2c
   displayName: 'Install APT Packages'
 
 - script: |
