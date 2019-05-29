@@ -34,7 +34,9 @@ steps:
                           libwebp-dev \
                           libonig-dev \
                           libkrb5-dev \
-                          libgssapi-krb5-2
+                          libgssapi-krb5-2 \
+                          libcurl4-openssl-dev \
+                          libxml2-dev
   displayName: 'Install APT Packages'
 
 - script: |
