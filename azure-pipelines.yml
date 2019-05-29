@@ -32,7 +32,9 @@ steps:
                           libzip-dev \
                           libsqlite3-dev \
                           libwebp-dev \
-                          libonig-dev
+                          libonig-dev \
+                          libkrb5-dev \
+                          libgssapi-krb5-2
   displayName: 'Install APT Packages'
 
 - script: |
