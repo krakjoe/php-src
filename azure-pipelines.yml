@@ -37,6 +37,7 @@ steps:
                           libgssapi-krb5-2 \
                           libcurl4-openssl-dev \
                           libxml2-dev \
+                          libxslt1-dev \
                           libpq-dev \
                           libreadline-dev
   displayName: 'Install APT Packages'
