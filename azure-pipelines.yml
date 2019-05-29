@@ -107,5 +107,5 @@ steps:
   displayName: "Install"
 
 - script: |
-    php run-tests.php -P -j$(/usr/bin/nproc) -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
+    REPORT_EXIT_STATUS=1 php run-tests.php -P -j$(/usr/bin/nproc) -q -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" --offline --show-diff --show-slow 1000 --set-timeout 120
   displayName: "Run Tests"
