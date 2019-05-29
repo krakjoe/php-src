@@ -80,14 +80,14 @@ variables:
     --with-config-file-scan-dir=/etc/php.d
   
   run: |
-    TEST_PHP_JUNIT=junit.xml php run-tests.php -P \
-                                               -j$(/usr/bin/nproc) \
-                                               -q \
-                                               -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" \
-                                               --offline \
-                                               --show-diff \
-                                               --show-slow 1000 \
-                                               --set-timeout 120
+    REPORT_EXIT_STATUS=no TEST_PHP_JUNIT=junit.xml php run-tests.php -P \
+                                                                     -j$(/usr/bin/nproc) \
+                                                                     -q \
+                                                                     -g "FAIL,XFAIL,BORK,WARN,LEAK,SKIP" \
+                                                                     --offline \
+                                                                     --show-diff \
+                                                                     --show-slow 1000 \
+                                                                     --set-timeout 120
 
 jobs:
   - job: NO_DEBUG_NO_ZTS
