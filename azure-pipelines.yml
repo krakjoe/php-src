@@ -11,6 +11,10 @@ pool:
 
 steps:
 - script: |
+    sudo apt-get update
+  displayName: "APT Update"
+
+- script: |
     sudo apt-get install  locales \
                           language-pack-de \
                           re2c \
@@ -24,7 +28,7 @@ steps:
                           libsasl2-dev \
                           libxpm-dev \
                           libzip-dev
-  displayName: 'Install Pre-requisites'
+  displayName: 'Install APT Packages'
 
 - script: |
     ./buildconf --force
