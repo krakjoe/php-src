@@ -572,9 +572,11 @@ static int php_openssl_apply_peer_verification_policy(SSL *ssl, X509 *peer, php_
 			} else if (php_openssl_matches_common_name(peer, peer_name)) {
 				return SUCCESS;
 			} else {
+				php_error_docref(NULL, E_WARNING, "Could not verify peer_name");
 				return FAILURE;
 			}
 		} else {
+			php_error_docref(NULL, E_WARNING, "Missing peer_name");
 			return FAILURE;
 		}
 	}
@@ -1541,7 +1543,9 @@ static void php_openssl_enable_client_sni(php_stream *stream, php_openssl_netstr
 	GET_VER_OPT_STRING("peer_name", sni_server_name);
 
 	if (sni_server_name) {
-		SSL_set_tlsext_host_name(sslsock->ssl_handle, sni_server_name);
+		if (!SSL_set_tlsext_host_name(sslsock->ssl_handle, sni_server_name)) {
+			php_error_docref(NULL, E_WARNING, "set_tlsext_host_name failed");
+		}
 	}
 }
 /* }}} */

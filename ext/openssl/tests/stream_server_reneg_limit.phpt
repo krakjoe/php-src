@@ -70,23 +70,28 @@ $serverCode = sprintf($serverCode, $certFile);
 $clientCode = <<<'CODE'
     $cmd = 'openssl s_client -connect 127.0.0.1:64321';
     $descriptorSpec = [["pipe", "r"], ["pipe", "w"], ["pipe", "w"]];
+    echo "a\n";
     $process = proc_open($cmd, $descriptorSpec, $pipes);
+    echo "b\n";
 
     list($stdin, $stdout, $stderr) = $pipes;
 
     // Trigger renegotiation twice
     // Server settings only allow one per second (should result in disconnection)
     fwrite($stdin, "R\nR\nR\nR\n");
+    echo "c\n";
 
     $lines = [];
     while(!feof($stderr)) {
         fgets($stderr);
     }
+    echo "d\n";
 
     fclose($stdin);
     fclose($stdout);
     fclose($stderr);
     proc_terminate($process);
+    echo "e\n";
 CODE;
 
 include 'CertificateGenerator.inc';
