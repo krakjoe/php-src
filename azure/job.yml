@@ -51,6 +51,7 @@ jobs:
       displayName: "SETUP MYSQL"
     - script: |
         sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+        sudo -u postgres psql -c "CREATE DATABASE test;"
       displayName: "SETUP PGSQL"
     - script: ./buildconf --force
       displayName: "CONFIGURE GENERATION"
