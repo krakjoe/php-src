@@ -38,8 +38,11 @@ $serverCode = <<<'CODE'
         }
     ]]);
 
+    echo "x\n";
     $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
+    echo "y\n";
     phpt_notify();
+    echo "z\n";
 
     $clients = [];
     while (1) {
