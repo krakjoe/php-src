@@ -46,6 +46,12 @@ jobs:
                            postgresql-contrib \
                            daemon
       displayName: "APT INSTALL PACKAGES"
+    - script: |
+        mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS test"
+      displayName: "SETUP MYSQL"
+    - script: |
+        sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+      displayName: "SETUP PGSQL"
     - script: ./buildconf --force
       displayName: "CONFIGURE GENERATION"
     - script: |
@@ -110,12 +116,6 @@ jobs:
         echo mysqli.default_socket=/var/run/mysqld/mysqld.sock     > /etc/php.d/mysqli.ini
         echo pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock  > /etc/php.d/pdo_mysql.ini
       displayName: "INSTALL CONFIGURATION FILES"
-    - script: |
-        mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS test"
-      displayName: "SETUP MYSQL"
-    - script: |
-        echo 'postgres:postgres' | sudo chpasswd
-      displayName: "SETUP PGSQL"
     - script: |
         export MYSQL_TEST_USER=root
         export MYSQL_TEST_PASSWD=root
