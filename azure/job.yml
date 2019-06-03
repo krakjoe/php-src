@@ -114,7 +114,7 @@ jobs:
         mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS test"
       displayName: "SETUP MYSQL"
     - script: |
-        echo '<?php $conn_str .= " user=postgres"; ?>' >> ext/pgsql/tests/config.inc
+        echo 'postgres:postgres' | sudo chpasswd
       displayName: "SETUP PGSQL"
     - script: |
         export MYSQL_TEST_USER=root
