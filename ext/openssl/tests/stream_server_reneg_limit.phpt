@@ -49,18 +49,24 @@ $serverCode = <<<'CODE'
         $r = array_merge([$server], $clients);
         $w = $e = [];
 
+        echo "q\n";
         stream_select($r, $w, $e, $timeout=42);
+        echo "r\n";
 
         foreach ($r as $sock) {
             if ($sock === $server && ($client = stream_socket_accept($server, $timeout = 42))) {
+                echo "s\n";
                 $clientId = (int) $client;
                 $clients[$clientId] = $client;
             } elseif ($sock !== $server) {
+                echo "t\n";
                 $clientId = (int) $sock;
                 $buffer = fread($sock, 1024);
                 if (strlen($buffer)) {
+                    echo "u\n";
                     continue;
                 } elseif (!is_resource($sock) || feof($sock)) {
+                    echo "v\n";
                     unset($clients[$clientId]);
                     break 2;
                 }
@@ -73,28 +79,28 @@ $serverCode = sprintf($serverCode, $certFile);
 $clientCode = <<<'CODE'
     $cmd = 'openssl s_client -connect 127.0.0.1:64321';
     $descriptorSpec = [["pipe", "r"], ["pipe", "w"], ["pipe", "w"]];
-    echo "a\n";
+    fwrite(STDERR, "a\n");
     $process = proc_open($cmd, $descriptorSpec, $pipes);
-    echo "b\n";
+    fwrite(STDERR, "b\n");
 
     list($stdin, $stdout, $stderr) = $pipes;
 
     // Trigger renegotiation twice
     // Server settings only allow one per second (should result in disconnection)
     fwrite($stdin, "R\nR\nR\nR\n");
-    echo "c\n";
+    fwrite(STDERR, "c\n");
 
     $lines = [];
     while(!feof($stderr)) {
         fgets($stderr);
     }
-    echo "d\n";
+    fwrite(STDERR, "d\n");
 
     fclose($stdin);
     fclose($stdout);
     fclose($stderr);
     proc_terminate($process);
-    echo "e\n";
+    fwrite(STDERR, "e\n");
 CODE;
 
 include 'CertificateGenerator.inc';
