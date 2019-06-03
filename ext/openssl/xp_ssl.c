@@ -1941,6 +1941,13 @@ static int php_openssl_enable_crypto(php_stream *stream,
 		do {
 			struct timeval cur_time, elapsed_time;
 
+			unsigned long err_code;
+			if ((err_code = ERR_get_error())) {
+				char err_buf[512];
+				php_error_docref(NULL, E_WARNING,
+					"Unexpected error: %ld: %s", err_code, ERR_error_string(err_code, err_buf));
+			}
+
 			if (sslsock->is_client) {
 				n = SSL_connect(sslsock->ssl_handle);
 			} else {
@@ -2110,6 +2117,13 @@ static size_t php_openssl_sockop_io(int read, php_stream *stream, char *buf, siz
 					sslsock->s.timeout_event = 1;
 					return -1;
 				}
+			}
+
+			unsigned long err_code;
+			if ((err_code = ERR_get_error())) {
+				char err_buf[512];
+				php_error_docref(NULL, E_WARNING,
+					"Unexpected error: %ld: %s", err_code, ERR_error_string(err_code, err_buf));
 			}
 
 			/* Now, do the IO operation. Don't block if we can't complete... */
