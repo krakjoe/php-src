@@ -212,6 +212,12 @@ AC_ARG_ENABLE([inline-optimization],
   [ZEND_INLINE_OPTIMIZATION=$enableval],
   [ZEND_INLINE_OPTIMIZATION=yes])
 
+AC_ARG_ENABLE([overflow-handler],
+  [AS_HELP_STRING([--enable-overflow-handler],
+    [Enable overflow handling])],
+  [ZEND_OVERFLOW_HANDLER=$enableval],
+  [ZEND_OVERFLOW_HANDLER=no])
+
 AC_MSG_CHECKING(whether to enable thread-safety)
 AC_MSG_RESULT($ZEND_MAINTAINER_ZTS)
 
@@ -220,6 +226,9 @@ AC_MSG_RESULT($ZEND_INLINE_OPTIMIZATION)
 
 AC_MSG_CHECKING(whether to enable Zend debugging)
 AC_MSG_RESULT($ZEND_DEBUG)
+  
+AC_MSG_CHECKING(whether to enable Zend overflow handler)
+AC_MSG_RESULT($ZEND_OVERFLOW_HANDLER)  
 
 if test "$ZEND_DEBUG" = "yes"; then
   AC_DEFINE(ZEND_DEBUG,1,[ ])
@@ -237,6 +246,13 @@ test -n "$DEBUG_CFLAGS" && CFLAGS="$CFLAGS $DEBUG_CFLAGS"
 if test "$ZEND_MAINTAINER_ZTS" = "yes"; then
   AC_DEFINE(ZTS,1,[ ])
   CFLAGS="$CFLAGS -DZTS"
+fi
+
+if test "$ZEND_OVERFLOW_HANDLER" = "yes"; then
+  AC_DEFINE(ZEND_OVERFLOW_HANDLER,1,[ ])
+  EXTRA_LIBS="$EXTRA_LIBS -lpthread"
+  CFLAGS="$CFLAGS -DZEND_OVERFLOW_HANDLER"
+  PHP_SUBST(EXTRA_LIBS)
 fi
 
 changequote({,})

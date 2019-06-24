@@ -33,6 +33,10 @@
 #include "zend_smart_string.h"
 #include "zend_cpuinfo.h"
 
+#ifdef ZEND_OVERFLOW_HANDLER
+#include <pthread.h>
+#endif
+
 static size_t global_map_ptr_last = 0;
 
 #ifdef ZTS
@@ -773,6 +777,101 @@ static zend_bool php_auto_globals_create_globals(zend_string *name) /* {{{ */
 }
 /* }}} */
 
+#ifdef ZEND_OVERFLOW_HANDLER
+/* {{{ */
+static void*  zend_stack_address;
+static size_t zend_stack_size;
+static size_t zend_page_size; /* }}} */
+
+static void zend_overflow_handler(int signo, siginfo_t *info, void *ucontext) { /* {{{ */
+    struct sigaction sa;
+    void *address = info->si_addr;
+    
+    if (address < (zend_stack_address + zend_page_size)) {
+        zend_execute_data *execute_data = EG(current_execute_data);
+        
+        while (!EX(func) && execute_data) {
+            execute_data = EX(prev_execute_data);
+        }
+        
+        if (execute_data && EX(func)) {
+            if (EX(func)->common.scope) {
+                fprintf(stderr, "overflow at %s::%s", 
+                    ZSTR_VAL(EX(func)->common.scope->name), 
+                    ZSTR_VAL(EX(func)->common.function_name));
+            } else {
+                fprintf(stderr, "overflow at %s",
+                    ZSTR_VAL(EX(func)->common.function_name));
+            }
+            if (ZEND_USER_CODE(EX(func)->type)) {
+                fprintf(stderr, " in %s on line %d\n",
+                    ZSTR_VAL(EX(func)->op_array.filename),
+                    EX(opline)->lineno);
+            } else {
+                fprintf(stderr, " in <internal>\n");
+            }
+        } else {
+            fprintf(stderr, "overflow at %p\n", address);
+        }
+        
+        memset(&sa, 0, sizeof(sa));
+        sa.sa_sigaction = SIG_DFL;
+        sigaction(signo, &sa, NULL);
+
+        abort();
+    }
+} /* }}} */
+
+/* {{{ */
+static void zend_overflow_startup(void) {
+    pthread_attr_t attr;
+    struct sigaction sa;
+    stack_t st;
+    
+    if (pthread_attr_init(&attr) != SUCCESS) {
+        return;
+    }
+
+#ifdef __FreeBSD__
+    if (pthread_attr_get_np(pthread_self(), &attr) != SUCCESS) {
+#else
+    if (pthread_getattr_np(pthread_self(), &attr) != SUCCESS) {
+#endif
+        pthread_attr_destroy(&attr);
+        return;
+    }
+    
+    if (pthread_attr_getstack(&attr, &zend_stack_address, &zend_stack_size) != SUCCESS) {
+        pthread_attr_destroy(&attr);
+        return;
+    }
+    
+    pthread_attr_destroy(&attr);
+    
+    zend_page_size = sysconf(_SC_PAGESIZE);
+    
+    st.ss_sp = malloc(SIGSTKSZ);
+    if (st.ss_sp == NULL) {
+        return;
+    }
+    st.ss_size = SIGSTKSZ;
+    st.ss_flags = 0;
+    
+    if (sigaltstack(&st, NULL) != SUCCESS) {
+        free(st.ss_sp);
+        return;
+    }
+    
+    sa.sa_flags = SA_SIGINFO | SA_ONSTACK;
+    sa.sa_handler = zend_overflow_handler;
+    sigemptyset(&sa.sa_mask);
+    
+    if (sigaction(SIGSEGV, &sa, NULL) != SUCCESS) {
+        perror("failed to setup overflow handler");
+    }
+} /* }}} */
+#endif
+
 int zend_startup(zend_utility_functions *utility_functions) /* {{{ */
 {
 #ifdef ZTS
@@ -786,6 +885,10 @@ int zend_startup(zend_utility_functions *utility_functions) /* {{{ */
 #endif
 
 	zend_cpu_startup();
+	
+#ifdef ZEND_OVERFLOW_HANDLER
+    zend_overflow_startup();
+#endif
 
 #ifdef ZEND_WIN32
 	php_win32_cp_set_by_id(65001);
