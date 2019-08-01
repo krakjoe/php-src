@@ -22,6 +22,7 @@
 #include "main/php.h"
 #include "main/php_globals.h"
 #include "zend.h"
+#include "zend_bounds.h"
 #include "zend_extensions.h"
 #include "zend_compile.h"
 #include "ZendAccelerator.h"
@@ -2827,6 +2828,14 @@ static void accel_move_code_to_huge_pages(void)
 # endif /* defined(MAP_HUGETLB) || defined(MADV_HUGEPAGE) */
 #endif /* HAVE_HUGE_CODE_PAGES */
 
+static zend_binding_t accel_get_binding(const void *mem) {
+    if (accel_startup_ok) {
+        /* to be filled in by dmitry */
+    }
+
+    return zend_get_binding_default(mem);
+}
+
 static int accel_startup(zend_extension *extension)
 {
 #ifdef ZTS
@@ -2884,6 +2893,8 @@ static int accel_startup(zend_extension *extension)
 
 	orig_post_startup_cb = zend_post_startup_cb;
 	zend_post_startup_cb = accel_post_startup;
+
+    zend_get_binding_function = accel_get_binding;
 
 	/* Prevent unloadig */
 	extension->handle = 0;

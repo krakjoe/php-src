@@ -18,6 +18,7 @@
 */
 
 #include "zend.h"
+#include "zend_bounds.h"
 #include "zend_extensions.h"
 #include "zend_modules.h"
 #include "zend_constants.h"
@@ -823,6 +824,8 @@ int zend_startup(zend_utility_functions *utility_functions) /* {{{ */
 	zend_resolve_path = utility_functions->resolve_path_function;
 
 	zend_interrupt_function = NULL;
+
+    zend_get_binding_function  = zend_get_binding_default;
 
 #if HAVE_DTRACE
 /* build with dtrace support */

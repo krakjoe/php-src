@@ -20,6 +20,7 @@
 */
 
 #include "zend.h"
+#include "zend_bounds.h"
 #include "zend_execute.h"
 #include "zend_API.h"
 #include "zend_modules.h"
@@ -31,6 +32,8 @@
 #include "zend_inheritance.h"
 
 #include <stdarg.h>
+
+ZEND_API zend_binding_t (*zend_get_binding_function)(const void *mem);
 
 /* these variables are true statics/globals, and have to be mutex'ed on every access */
 ZEND_API HashTable module_registry;
