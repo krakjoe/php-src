@@ -3431,7 +3431,7 @@ static uint32_t zend_get_arg_num(zend_function *fn, zend_string *arg_name) {
 }
 
 uint32_t zend_compile_args(
-		zend_ast *ast, zend_function *fbc, bool *may_have_extra_named_args) /* {{{ */
+		zend_ast *ast, zend_function *fbc, bool *may_have_extra_named_args, bool *is_call_partial) /* {{{ */
 {
 	zend_ast_list *args = zend_ast_get_list(ast);
 	uint32_t i;
@@ -3445,7 +3445,9 @@ uint32_t zend_compile_args(
 	bool may_have_undef = 0;
 	/* Whether there may be any extra named arguments collected into a variadic. */
 	*may_have_extra_named_args = 0;
-
+	/* Whether call to partial */
+    *is_call_partial = 0;
+    
 	for (i = 0; i < args->children; ++i) {
 		zend_ast *arg = args->child[i];
 		zend_string *arg_name = NULL;
@@ -3475,6 +3477,16 @@ uint32_t zend_compile_args(
 				*may_have_extra_named_args = 1;
 			}
 			continue;
+		}
+		
+		if (arg->kind == ZEND_AST_PARTIAL_ARG) {
+		    opline = zend_emit_op(NULL, ZEND_SEND_PARTIAL, NULL, NULL);
+		    opline->op2.num = arg_num;
+		    opline->result.var = EX_NUM_TO_VAR(arg_num - 1);
+		    arg_count++;
+		    
+		    *is_call_partial = 1;
+		    continue;
 		}
 
 		if (arg->kind == ZEND_AST_NAMED_ARG) {
@@ -3660,14 +3672,35 @@ ZEND_API zend_uchar zend_get_call_op(const zend_op *init_op, zend_function *fbc)
 }
 /* }}} */
 
+void zend_compile_call_partial(znode *result, uint32_t arg_count, bool may_have_extra_named_args, uint32_t opnum_init, zend_function *fbc) { /* {{{ */
+    zend_op *opline = &CG(active_op_array)->opcodes[opnum_init];
+    
+    opline->extended_value = arg_count;
+    
+    if (opline->opcode == ZEND_INIT_FCALL) {
+        opline->op1.num = zend_vm_calc_used_stack(arg_count, fbc);
+    }
+    
+    opline = zend_emit_op(result, ZEND_PARTIAL_APPLY, NULL, NULL);
+    if (may_have_extra_named_args) {
+        opline->extended_value = ZEND_FCALL_MAY_HAVE_EXTRA_NAMED_PARAMS;
+    }
+} /* }}} */
+
 void zend_compile_call_common(znode *result, zend_ast *args_ast, zend_function *fbc) /* {{{ */
 {
 	zend_op *opline;
 	uint32_t opnum_init = get_next_op_number() - 1;
 	uint32_t arg_count;
 	bool may_have_extra_named_args;
+    bool is_partial_call;
+    
+	arg_count = zend_compile_args(args_ast, fbc, &may_have_extra_named_args, &is_partial_call);
 
-	arg_count = zend_compile_args(args_ast, fbc, &may_have_extra_named_args);
+    if (is_partial_call) {
+        zend_compile_call_partial(result, arg_count, may_have_extra_named_args, opnum_init, fbc);
+        return;
+    }
 
 	zend_do_extended_fcall_begin();
 

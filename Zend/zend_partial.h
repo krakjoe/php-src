@@ -12,32 +12,15 @@
    | obtain it through the world-wide-web, please send a note to          |
    | license@zend.com so we can mail you a copy immediately.              |
    +----------------------------------------------------------------------+
-   | Authors: Sterling Hughes <sterling@php.net>                          |
-   |          Marcus Boerger <helly@php.net>                              |
+   | Authors: krakjoe <krakjoe@php.net>                                   |
    +----------------------------------------------------------------------+
 */
+#ifndef ZEND_PARTIAL_H
+#define ZEND_PARTIAL_H
 
-#include "zend.h"
-#include "zend_API.h"
-#include "zend_attributes.h"
-#include "zend_builtin_functions.h"
-#include "zend_interfaces.h"
-#include "zend_exceptions.h"
-#include "zend_closures.h"
-#include "zend_generators.h"
-#include "zend_weakrefs.h"
-#include "zend_enum.h"
-#include "zend_partial.h"
+extern zend_class_entry *zend_partial_ce;
 
-ZEND_API void zend_register_default_classes(void)
-{
-	zend_register_interfaces();
-	zend_register_default_exception();
-	zend_register_iterator_wrapper();
-	zend_register_closure_ce();
-	zend_register_generator_ce();
-	zend_register_weakref_ce();
-	zend_register_attribute_ce();
-	zend_register_enum_ce();
-	zend_register_partial_ce();
-}
+void zend_register_partial_ce(void);
+
+void zend_partial_apply(zval *res, zend_function *op_array, zend_class_entry *scope, zend_class_entry *called_scope, zval *this_ptr, zend_execute_data *call);
+#endif

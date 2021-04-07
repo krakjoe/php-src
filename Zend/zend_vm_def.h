@@ -8748,6 +8748,51 @@ ZEND_VM_HANDLER(200, ZEND_FETCH_GLOBALS, UNUSED, UNUSED)
 	ZEND_VM_NEXT_OPCODE();
 }
 
+ZEND_VM_HANDLER(201, ZEND_SEND_PARTIAL, UNUSED, NUM)
+{
+    USE_OPLINE;
+    zval *arg;
+    zend_execute_data *call = EX(call);
+    
+    arg = ZEND_CALL_VAR(call, opline->result.var);
+    
+    ZVAL_UNDEF(arg);
+    
+    ZEND_ADD_CALL_FLAG(EX(call), ZEND_CALL_PARTIAL);
+    
+    ZEND_VM_NEXT_OPCODE();
+}
+
+ZEND_VM_HANDLER(202, ZEND_PARTIAL_APPLY, ANY, ANY)
+{
+    USE_OPLINE
+    zend_execute_data *call = EX(call);
+    zend_function *fbc  = call->func;
+    zval *result = EX_VAR(opline->result.var);
+    zval *object;
+    zend_class_entry *scope;
+    
+    SAVE_OPLINE();
+
+    if (Z_TYPE(call->This) == IS_OBJECT) {
+		scope = Z_OBJCE(call->This);
+		if (UNEXPECTED((fbc->common.fn_flags & ZEND_ACC_STATIC))) {
+			object = NULL;
+		} else {
+			object = &call->This;
+		}
+	} else {
+		scope = Z_CE(call->This);
+		object = NULL;
+	}
+
+    zend_partial_apply(result, fbc, 
+        EX(func)->op_array.scope, scope, 
+        object, call);
+	
+    ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION();
+}
+
 ZEND_VM_HANDLER(186, ZEND_ISSET_ISEMPTY_THIS, UNUSED, UNUSED)
 {
 	USE_OPLINE
