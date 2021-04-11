@@ -19507,6 +19507,7 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_ROPE_END_SPEC_TMP_CONST_HANDLE
 	uint32_t i;
 	size_t len = 0;
 	char *target;
+	bool is_literal = true;
 
 	rope = (zend_string**)EX_VAR(opline->op1.var);
 	if (IS_CONST == IS_CONST) {
@@ -19546,12 +19547,17 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_ROPE_END_SPEC_TMP_CONST_HANDLE
 	ZVAL_STR(ret, zend_string_alloc(len, 0));
 	target = Z_STRVAL_P(ret);
 	for (i = 0; i <= opline->extended_value; i++) {
+	    if (!GC_IS_LITERAL(rope[i])) {
+	        is_literal = false;
+	    }
 		memcpy(target, ZSTR_VAL(rope[i]), ZSTR_LEN(rope[i]));
 		target += ZSTR_LEN(rope[i]);
 		zend_string_release_ex(rope[i], 0);
 	}
 	*target = '\0';
-
+    if (is_literal) {
+        Z_SET_IS_LITERAL_P(ret);
+    }
 	ZEND_VM_NEXT_OPCODE();
 }
 
@@ -19983,6 +19989,7 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDL
 	uint32_t i;
 	size_t len = 0;
 	char *target;
+	bool is_literal = true;
 
 	rope = (zend_string**)EX_VAR(opline->op1.var);
 	if ((IS_TMP_VAR|IS_VAR) == IS_CONST) {
@@ -20022,12 +20029,17 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDL
 	ZVAL_STR(ret, zend_string_alloc(len, 0));
 	target = Z_STRVAL_P(ret);
 	for (i = 0; i <= opline->extended_value; i++) {
+	    if (!GC_IS_LITERAL(rope[i])) {
+	        is_literal = false;
+	    }
 		memcpy(target, ZSTR_VAL(rope[i]), ZSTR_LEN(rope[i]));
 		target += ZSTR_LEN(rope[i]);
 		zend_string_release_ex(rope[i], 0);
 	}
 	*target = '\0';
-
+    if (is_literal) {
+        Z_SET_IS_LITERAL_P(ret);
+    }
 	ZEND_VM_NEXT_OPCODE();
 }
 
@@ -20842,6 +20854,7 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(Z
 	uint32_t i;
 	size_t len = 0;
 	char *target;
+	bool is_literal = true;
 
 	rope = (zend_string**)EX_VAR(opline->op1.var);
 	if (IS_CV == IS_CONST) {
@@ -20881,12 +20894,17 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(Z
 	ZVAL_STR(ret, zend_string_alloc(len, 0));
 	target = Z_STRVAL_P(ret);
 	for (i = 0; i <= opline->extended_value; i++) {
+	    if (!GC_IS_LITERAL(rope[i])) {
+	        is_literal = false;
+	    }
 		memcpy(target, ZSTR_VAL(rope[i]), ZSTR_LEN(rope[i]));
 		target += ZSTR_LEN(rope[i]);
 		zend_string_release_ex(rope[i], 0);
 	}
 	*target = '\0';
-
+    if (is_literal) {
+        Z_SET_IS_LITERAL_P(ret);
+    }
 	ZEND_VM_NEXT_OPCODE();
 }
 
