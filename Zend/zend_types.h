@@ -749,7 +749,7 @@ static zend_always_inline uint32_t zval_gc_info(uint32_t gc_type_info) {
 		if (!(GC_FLAGS(p) & GC_IMMUTABLE)) GC_UNPROTECT_RECURSION(p); \
 	} while (0)
 
-#define Z_IS_LITERAL(zval)          GC_IS_LITERAL(Z_COUNTED(zval))
+#define Z_IS_LITERAL(zval)          (Z_TYPE(zval) == IS_STRING && GC_IS_LITERAL(Z_COUNTED(zval)))
 #define Z_IS_LITERAL_P(zval_p)      Z_IS_LITERAL(*(zval_p))
 #define Z_SET_IS_LITERAL(zval)      GC_SET_IS_LITERAL(Z_COUNTED(zval))
 #define Z_SET_IS_LITERAL_P(zval_p)      Z_SET_IS_LITERAL(*(zval_p))
