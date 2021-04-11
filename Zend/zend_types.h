@@ -701,6 +701,7 @@ static zend_always_inline uint32_t zval_gc_info(uint32_t gc_type_info) {
 #define IS_STR_PERSISTENT			GC_PERSISTENT /* allocated using malloc */
 #define IS_STR_PERMANENT        	(1<<8)        /* relives request boundary */
 #define IS_STR_VALID_UTF8           (1<<9)        /* valid UTF-8 according to PCRE */
+#define IS_STR_LITERAL              (1<<10)
 
 /* array flags */
 #define IS_ARRAY_IMMUTABLE			GC_IMMUTABLE
@@ -719,6 +720,13 @@ static zend_always_inline uint32_t zval_gc_info(uint32_t gc_type_info) {
 	(*(zend_class_entry **)ZEND_MAP_PTR_OFFSET2PTR(GC_REFCOUNT(s)))
 #define ZSTR_SET_CE_CACHE(s, ce) do { \
 		*((zend_class_entry **)ZEND_MAP_PTR_OFFSET2PTR(GC_REFCOUNT(s))) = ce; \
+	} while (0)
+
+#define GC_IS_LITERAL(p) \
+	(GC_TYPE_INFO(p) & IS_STR_LITERAL)
+
+#define GC_SET_IS_LITERAL(p) do { \
+        GC_TYPE_INFO(p) |= IS_STR_LITERAL; \
 	} while (0)
 
 /* Recursion protection macros must be used only for arrays and objects */
@@ -740,6 +748,11 @@ static zend_always_inline uint32_t zval_gc_info(uint32_t gc_type_info) {
 #define GC_TRY_UNPROTECT_RECURSION(p) do { \
 		if (!(GC_FLAGS(p) & GC_IMMUTABLE)) GC_UNPROTECT_RECURSION(p); \
 	} while (0)
+
+#define Z_IS_LITERAL(zval)          GC_IS_LITERAL(Z_COUNTED(zval))
+#define Z_IS_LITERAL_P(zval_p)      Z_IS_LITERAL(*(zval_p))
+#define Z_SET_IS_LITERAL(zval)      GC_SET_IS_LITERAL(Z_COUNTED(zval))
+#define Z_SET_IS_LITERAL_P(zval_p)      Z_SET_IS_LITERAL(*(zval_p))
 
 #define Z_IS_RECURSIVE(zval)        GC_IS_RECURSIVE(Z_COUNTED(zval))
 #define Z_PROTECT_RECURSION(zval)   GC_PROTECT_RECURSION(Z_COUNTED(zval))

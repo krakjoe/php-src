@@ -275,6 +275,23 @@ PHP_FUNCTION(is_resource)
 }
 /* }}} */
 
+/* {{{ Returns true if variable is a safe literal (string defined by the programmer)
+   Warning: ??? */
+PHP_FUNCTION(is_literal)
+{
+	zval *arg;
+
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_ZVAL(arg)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (!arg || Z_TYPE_P(arg) != IS_STRING) {
+	    RETURN_FALSE;
+	}
+
+	RETURN_BOOL(Z_IS_LITERAL(*arg));
+}
+
 /* {{{ Returns true if variable is a boolean
    Warning: This function is special-cased by zend_compile.c and so is usually bypassed */
 PHP_FUNCTION(is_bool)

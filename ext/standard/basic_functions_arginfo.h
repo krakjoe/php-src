@@ -2064,6 +2064,10 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_is_resource arginfo_boolval
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_is_literal, 0, 1, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 #define arginfo_is_bool arginfo_boolval
 
 #define arginfo_is_int arginfo_boolval
@@ -2784,6 +2788,7 @@ ZEND_FUNCTION(boolval);
 ZEND_FUNCTION(strval);
 ZEND_FUNCTION(is_null);
 ZEND_FUNCTION(is_resource);
+ZEND_FUNCTION(is_literal);
 ZEND_FUNCTION(is_bool);
 ZEND_FUNCTION(is_int);
 ZEND_FUNCTION(is_float);
@@ -3433,6 +3438,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(strval, arginfo_strval)
 	ZEND_FE(is_null, arginfo_is_null)
 	ZEND_FE(is_resource, arginfo_is_resource)
+	ZEND_FE(is_literal, arginfo_is_literal)
 	ZEND_FE(is_bool, arginfo_is_bool)
 	ZEND_FE(is_int, arginfo_is_int)
 	ZEND_FALIAS(is_integer, is_int, arginfo_is_integer)

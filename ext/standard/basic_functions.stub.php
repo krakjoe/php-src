@@ -1397,6 +1397,8 @@ function is_null(mixed $value): bool {}
 
 function is_resource(mixed $value): bool {}
 
+function is_literal(string $value): bool {}
+
 function is_bool(mixed $value): bool {}
 
 function is_int(mixed $value): bool {}

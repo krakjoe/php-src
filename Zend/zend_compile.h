@@ -696,6 +696,9 @@ struct _zend_execute_data {
 /* convert constant from compile-time to run-time */
 # define ZEND_PASS_TWO_UPDATE_CONSTANT(op_array, opline, node) do { \
 		(node).zv = CT_CONSTANT_EX(op_array, (node).constant); \
+		if (Z_TYPE_P((node).zv) == IS_STRING) { \
+		    GC_SET_IS_LITERAL(Z_STR_P(zv)); \
+		} \
 	} while (0)
 
 #else
@@ -710,9 +713,14 @@ struct _zend_execute_data {
 
 /* convert constant from compile-time to run-time */
 # define ZEND_PASS_TWO_UPDATE_CONSTANT(op_array, opline, node) do { \
+        zval *zv; \
 		(node).constant = \
 			(((char*)CT_CONSTANT_EX(op_array, (node).constant)) - \
 			((char*)opline)); \
+		zv = ((zval*)(((char*)(opline)) + (int32_t)(node).constant)); \
+		if (Z_TYPE_P(zv) == IS_STRING) { \
+		    GC_SET_IS_LITERAL(Z_STR_P(zv)); \
+		} \
 	} while (0)
 
 #endif

@@ -49,6 +49,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #include <zend_language_parser.h>
 
 #include "zend_portability.h"
+#include <zend_types.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
