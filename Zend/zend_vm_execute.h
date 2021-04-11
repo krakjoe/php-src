@@ -8416,7 +8416,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDL
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if (IS_CONST & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -10776,7 +10775,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_CONST_CV_HANDLER(Z
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if (IS_CONST & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -14862,7 +14860,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_TMPVAR_CONST_HANDL
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if ((IS_TMP_VAR|IS_VAR) & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -16292,7 +16289,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_TMPVAR_TMPVAR_HAND
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if ((IS_TMP_VAR|IS_VAR) & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -17976,7 +17972,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_TMPVAR_CV_HANDLER(
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if ((IS_TMP_VAR|IS_VAR) & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -39087,7 +39082,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_CV_CONST_HANDLER(Z
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if (IS_CV & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -42777,7 +42771,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_CV_TMPVAR_HANDLER(
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if (IS_CV & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -47792,7 +47785,6 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CONCAT_SPEC_CV_CV_HANDLER(ZEND
 			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
 			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
 			}
-
 			if (IS_CV & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
