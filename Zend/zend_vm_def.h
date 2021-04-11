@@ -418,6 +418,9 @@ ZEND_VM_HANDLER(8, ZEND_CONCAT, CONST|TMPVAR|CV, CONST|TMPVAR|CV, SPEC(NO_CONST_
 			memcpy(ZSTR_VAL(str), ZSTR_VAL(op1_str), ZSTR_LEN(op1_str));
 			memcpy(ZSTR_VAL(str) + ZSTR_LEN(op1_str), ZSTR_VAL(op2_str), ZSTR_LEN(op2_str)+1);
 			ZVAL_NEW_STR(EX_VAR(opline->result.var), str);
+			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
+			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
+			}
 			if (OP1_TYPE & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -3142,6 +3145,9 @@ ZEND_VM_COLD_CONSTCONST_HANDLER(53, ZEND_FAST_CONCAT, CONST|TMPVAR|CV, CONST|TMP
 			memcpy(ZSTR_VAL(str), ZSTR_VAL(op1_str), ZSTR_LEN(op1_str));
 			memcpy(ZSTR_VAL(str) + ZSTR_LEN(op1_str), ZSTR_VAL(op2_str), ZSTR_LEN(op2_str)+1);
 			ZVAL_NEW_STR(EX_VAR(opline->result.var), str);
+			if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
+			    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
+			}
 			if (OP1_TYPE & (IS_TMP_VAR|IS_VAR)) {
 				zend_string_release_ex(op1_str, 0);
 			}
@@ -3202,6 +3208,9 @@ ZEND_VM_COLD_CONSTCONST_HANDLER(53, ZEND_FAST_CONCAT, CONST|TMPVAR|CV, CONST|TMP
 		memcpy(ZSTR_VAL(str), ZSTR_VAL(op1_str), ZSTR_LEN(op1_str));
 		memcpy(ZSTR_VAL(str) + ZSTR_LEN(op1_str), ZSTR_VAL(op2_str), ZSTR_LEN(op2_str)+1);
 		ZVAL_NEW_STR(EX_VAR(opline->result.var), str);
+		if (Z_IS_LITERAL_P(op1) && Z_IS_LITERAL_P(op2)) {
+		    Z_SET_IS_LITERAL_P(EX_VAR(opline->result.var));
+		}
 		if (OP1_TYPE != IS_CONST) {
 			zend_string_release_ex(op1_str, 0);
 		}
