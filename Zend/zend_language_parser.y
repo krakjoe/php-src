@@ -573,16 +573,6 @@ class_declaration_statement:
 			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, 0, $<num>2, $7, zend_ast_get_str($3), $5, $6, $9, NULL, NULL, $4); }
 ;
 
-class_friend_modifiers:
-        %empty  { $$ = 0; }
-    |   T_FOR class_friend_list { $$ = $2; }
-;
-
-class_friend_list:
-        class_name                      { $$ = zend_ast_create_list(1, ZEND_AST_CLASS_FRIEND_LIST, $1); }
-    |   class_friend_list ',' class_name   { $$ = zend_ast_list_add($1, $3); }
-;
-
 class_modifiers:
 		class_modifier 					{ $$ = $1; }
 	|	class_modifiers class_modifier
@@ -602,8 +592,8 @@ trait_declaration_statement:
 
 interface_declaration_statement:
 		T_INTERFACE { $<num>$ = CG(zend_lineno); }
-		T_STRING interface_extends_list backup_doc_comment '{' class_statement_list '}'
-			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, ZEND_ACC_INTERFACE, $<num>2, $5, zend_ast_get_str($3), NULL, $4, $7, NULL, NULL, NULL); }
+		T_STRING class_friend_modifiers interface_extends_list backup_doc_comment '{' class_statement_list '}'
+			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, ZEND_ACC_INTERFACE, $<num>2, $6, zend_ast_get_str($3), NULL, $5, $8, NULL, NULL, $4); }
 ;
 
 enum_declaration_statement:
@@ -611,6 +601,17 @@ enum_declaration_statement:
 		T_STRING enum_backing_type implements_list backup_doc_comment '{' class_statement_list '}'
 			{ $$ = zend_ast_create_decl(ZEND_AST_CLASS, ZEND_ACC_ENUM|ZEND_ACC_FINAL, $<num>2, $6, zend_ast_get_str($3), NULL, $5, $8, NULL, $4, NULL); }
 ;
+
+class_friend_modifiers:
+        %empty  { $$ = 0; }
+    |   T_FOR class_friend_list { $$ = $2; }
+;
+
+class_friend_list:
+        class_name                      { $$ = zend_ast_create_list(1, ZEND_AST_CLASS_FRIEND_LIST, $1); }
+    |   class_friend_list ',' class_name   { $$ = zend_ast_list_add($1, $3); }
+;
+
 
 enum_backing_type:
 		%empty	{ $$ = NULL; }

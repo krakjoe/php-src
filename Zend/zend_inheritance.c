@@ -1350,7 +1350,8 @@ ZEND_API void zend_do_inheritance_ex(zend_class_entry *ce, zend_class_entry *par
 
         if (!friend) {
             zend_error_noreturn(E_COMPILE_ERROR, 
-                "Class %s is not a friend of %s", 
+                "%s %s is not a friend of %s", 
+                (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
                 ZSTR_VAL(ce->name), ZSTR_VAL(parent_ce->name));
         }
 
@@ -2759,6 +2760,36 @@ ZEND_API zend_class_entry *zend_do_link_class(zend_class_entry *ce, zend_string 
 				free_alloca(traits_and_interfaces, use_heap);
 				return NULL;
 			}
+			
+		    if (UNEXPECTED(iface->num_friends)) {
+                zend_class_name *begin = iface->friends,
+                                *end   = begin + iface->num_friends;
+                bool     friend = false;
+
+                while (begin < end) {
+                    if (!begin->name) {
+                        begin++;
+                        continue;
+                    }
+
+                    if (zend_string_equals_ci(begin->lc_name, ce->name)) {
+                        friend = true;
+                        break;
+                    }
+                    
+                    begin++;
+                }
+
+                if (!friend) {
+                    zend_error_noreturn(E_COMPILE_ERROR, 
+                        "%s %s is not a friend of %s", 
+                        (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
+                        ZSTR_VAL(ce->name), ZSTR_VAL(iface->name));
+                }
+
+                do_inherit_friends(ce, iface);
+	        }
+			
 			traits_and_interfaces[ce->num_traits + i] = iface;
 			if (iface) {
 				UPDATE_IS_CACHEABLE(iface);
@@ -2847,6 +2878,7 @@ ZEND_API zend_class_entry *zend_do_link_class(zend_class_entry *ce, zend_string 
 		zend_do_implement_interfaces(ce, interfaces);
 	} else if (parent && parent->num_interfaces) {
 		zend_do_inherit_interfaces(ce, parent);
+		
 	}
 	if (!(ce->ce_flags & (ZEND_ACC_INTERFACE|ZEND_ACC_TRAIT))
 		&& (ce->ce_flags & (ZEND_ACC_IMPLICIT_ABSTRACT_CLASS|ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))

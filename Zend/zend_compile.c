@@ -7502,15 +7502,30 @@ static void zend_compile_class_friends(zend_class_entry *ce, zend_ast *ast) {
 
         if (zend_string_equals_ci(ce->name, friends[i].lc_name)) {
             zend_error_noreturn(E_COMPILE_ERROR,
-                "Class %s may not be friends with itself",
+                "%s %s may not be friends with itself",
+                (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
                 ZSTR_VAL(ce->name));
         }
 
         if (ce->parent_name &&
             zend_string_equals_ci(ce->parent_name, friends[i].lc_name)) {
             zend_error_noreturn(E_COMPILE_ERROR,
-                "Class %s may not be friends with parent %s",
+                "%s %s may not be friends with parent %s",
+                (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
                 ZSTR_VAL(ce->name), ZSTR_VAL(ce->parent_name));
+        }
+
+        if (ce->num_interfaces) {
+            uint32_t ii = 0;
+
+            for (ii = 0; ii < ce->num_interfaces; ii++) {
+                if (zend_string_equals(ce->interface_names[ii].lc_name, friends[i].lc_name)) {
+                    zend_error_noreturn(E_COMPILE_ERROR,
+                        "%s %s may not be friends with parent %s",
+                        (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
+                        ZSTR_VAL(ce->name), ZSTR_VAL(ce->interface_names[ii].name)); 
+                }
+            }
         }
     }
 
@@ -7596,10 +7611,6 @@ void zend_compile_class_decl(znode *result, zend_ast *ast, bool toplevel) /* {{{
 			zend_resolve_const_class_name_reference(extends_ast, "class name");
 	}
 
-	if (friends_ast) {
-	    zend_compile_class_friends(ce, friends_ast);
-	}
-
 	CG(active_class_entry) = ce;
 
 	if (decl->child[3]) {
@@ -7608,6 +7619,10 @@ void zend_compile_class_decl(znode *result, zend_ast *ast, bool toplevel) /* {{{
 
 	if (implements_ast) {
 		zend_compile_implements(implements_ast);
+	}
+
+	if (friends_ast) {
+	    zend_compile_class_friends(ce, friends_ast);
 	}
 
 	if (ce->ce_flags & ZEND_ACC_ENUM) {
