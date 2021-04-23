@@ -374,7 +374,7 @@ ZEND_API void destroy_zend_class(zval *zv)
 					_destroy_zend_class_traits_info(ce);
 				}
 
-				if (ce->num_friends) {
+				if (ce->num_friends > 0) {
 					uint32_t i;
 
 					for (i = 0; i < ce->num_friends; i++) {

@@ -7490,17 +7490,19 @@ static void zend_compile_class_friends(zend_class_entry *ce, zend_ast *ast) {
     uint32_t i;
     zend_ast_list *list = zend_ast_get_list(ast);
 
-    zend_class_name *friends = emalloc(
-        sizeof(zend_class_name) * list->children);
+    ce->num_friends = list->children;
+    ce->friends = ecalloc(
+        sizeof(zend_class_name), list->children);
 
     for (i = 0; i < list->children; i++) {
         zend_ast *class_ast = list->child[i];
-        friends[i].name = 
+
+        ce->friends[i].name = 
             zend_resolve_const_class_name_reference(
                 class_ast, "class name");
-        friends[i].lc_name = zend_string_tolower(friends[i].name);
+        ce->friends[i].lc_name = zend_string_tolower(ce->friends[i].name);
 
-        if (zend_string_equals_ci(ce->name, friends[i].lc_name)) {
+        if (zend_string_equals_ci(ce->name, ce->friends[i].lc_name)) {
             zend_error_noreturn(E_COMPILE_ERROR,
                 "%s %s may not be friends with itself",
                 (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
@@ -7508,7 +7510,7 @@ static void zend_compile_class_friends(zend_class_entry *ce, zend_ast *ast) {
         }
 
         if (ce->parent_name &&
-            zend_string_equals_ci(ce->parent_name, friends[i].lc_name)) {
+            zend_string_equals_ci(ce->parent_name, ce->friends[i].lc_name)) {
             zend_error_noreturn(E_COMPILE_ERROR,
                 "%s %s may not be friends with parent %s",
                 (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
@@ -7519,7 +7521,7 @@ static void zend_compile_class_friends(zend_class_entry *ce, zend_ast *ast) {
             uint32_t ii = 0;
 
             for (ii = 0; ii < ce->num_interfaces; ii++) {
-                if (zend_string_equals(ce->interface_names[ii].lc_name, friends[i].lc_name)) {
+                if (zend_string_equals(ce->interface_names[ii].lc_name, ce->friends[i].lc_name)) {
                     zend_error_noreturn(E_COMPILE_ERROR,
                         "%s %s may not be friends with parent %s",
                         (ce->ce_flags & ZEND_ACC_INTERFACE) ? "Interface" : "Class",
@@ -7528,9 +7530,6 @@ static void zend_compile_class_friends(zend_class_entry *ce, zend_ast *ast) {
             }
         }
     }
-
-    ce->num_friends  = list->children;
-    ce->friends      = friends;
 }
 
 void zend_compile_class_decl(znode *result, zend_ast *ast, bool toplevel) /* {{{ */

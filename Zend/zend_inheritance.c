@@ -2787,7 +2787,9 @@ ZEND_API zend_class_entry *zend_do_link_class(zend_class_entry *ce, zend_string 
                         ZSTR_VAL(ce->name), ZSTR_VAL(iface->name));
                 }
 
-                do_inherit_friends(ce, iface);
+                if ((ce->ce_flags & ZEND_ACC_INTERFACE)) {
+                    do_inherit_friends(ce, iface);
+                }
 	        }
 			
 			traits_and_interfaces[ce->num_traits + i] = iface;
