@@ -148,7 +148,7 @@ struct _zend_class_entry {
 	HashTable function_table;
 	HashTable properties_info;
 	HashTable constants_table;
-
+    
 	ZEND_MAP_PTR_DEF(zend_class_mutable_data*, mutable_data);
 	zend_inheritance_cache_entry *inheritance_cache;
 
@@ -183,8 +183,11 @@ struct _zend_class_entry {
 	int (*serialize)(zval *object, unsigned char **buffer, size_t *buf_len, zend_serialize_data *data);
 	int (*unserialize)(zval *object, zend_class_entry *ce, const unsigned char *buf, size_t buf_len, zend_unserialize_data *data);
 
+    uint32_t num_friends;
 	uint32_t num_interfaces;
 	uint32_t num_traits;
+
+    zend_class_name *friends;
 
 	/* class_entry or string(s) depending on ZEND_ACC_LINKED */
 	union {

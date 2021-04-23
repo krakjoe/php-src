@@ -1241,6 +1241,69 @@ void zend_build_properties_info_table(zend_class_entry *ce)
 	} ZEND_HASH_FOREACH_END();
 }
 
+void do_inherit_friends(zend_class_entry *ce, zend_class_entry *parent) {
+    if (!ce->num_friends) {
+        if (parent->num_friends == 1) {
+            return;
+        }
+
+        zend_class_name *friend = ce->friends = 
+                ecalloc(
+                    sizeof(zend_class_name), parent->num_friends);
+
+        zend_class_name *begin = parent->friends,
+                        *end   = begin + parent->num_friends;
+
+        while (begin < end) {
+            if (UNEXPECTED(!begin->name)) {
+                begin++;
+                continue;
+            }
+            
+            if (UNEXPECTED(zend_string_equals_ci(ce->name, begin->name))) {
+                begin++;
+                continue;
+            }
+            
+            memcpy(friend, begin, sizeof(zend_class_name));
+            zend_string_addref(friend->name);
+            zend_string_addref(friend->lc_name);
+            
+            ce->num_friends++;
+            friend++;
+            begin++;
+        }
+    } else {
+        ce->friends = erealloc(ce->friends,
+                sizeof(zend_class_name) *
+                (ce->num_friends + parent->num_friends));
+
+        zend_class_name *begin  = parent->friends,
+                        *end    = begin + parent->num_friends,
+                        *friend = ce->friends + ce->num_friends;
+
+        while (begin < end) {
+            if (UNEXPECTED(!begin->name)) {
+                begin++;
+                continue;    
+            }
+
+            if (UNEXPECTED(zend_string_equals_ci(ce->name, begin->name))) {
+                begin++;
+                continue;
+            }
+
+            memcpy(friend, begin, sizeof(zend_class_name));
+            zend_string_addref(friend->name);
+            zend_string_addref(friend->lc_name);
+            
+            ce->num_friends++;
+            friend++;
+            begin++;
+        }
+    }
+}
+
 ZEND_API void zend_do_inheritance_ex(zend_class_entry *ce, zend_class_entry *parent_ce, bool checked) /* {{{ */
 {
 	zend_property_info *property_info;
@@ -1264,6 +1327,34 @@ ZEND_API void zend_do_inheritance_ex(zend_class_entry *ce, zend_class_entry *par
 		if (parent_ce->ce_flags & ZEND_ACC_FINAL) {
 			zend_error_noreturn(E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ZSTR_VAL(ce->name), ZSTR_VAL(parent_ce->name));
 		}
+	}
+
+	if (UNEXPECTED(parent_ce->num_friends)) {
+        zend_class_name *begin = parent_ce->friends,
+                        *end   = begin + parent_ce->num_friends;
+        bool     friend = false;
+
+        while (begin < end) {
+            if (!begin->name) {
+                begin++;
+                continue;
+            }
+
+            if (zend_string_equals_ci(begin->lc_name, ce->name)) {
+                friend = true;
+                break;
+            }
+            
+            begin++;
+        }
+
+        if (!friend) {
+            zend_error_noreturn(E_COMPILE_ERROR, 
+                "Class %s is not a friend of %s", 
+                ZSTR_VAL(ce->name), ZSTR_VAL(parent_ce->name));
+        }
+
+        do_inherit_friends(ce, parent_ce);
 	}
 
 	if (ce->parent_name) {

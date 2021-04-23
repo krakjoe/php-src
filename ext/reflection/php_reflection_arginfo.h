@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 6f36123e16ed34e45a527094ab643b6b57669a5d */
+ * Stub hash: 1046fd584c379059dedad048655a9be514850f76 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Reflection_getModifierNames, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, modifiers, IS_LONG, 0)
@@ -155,6 +155,9 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ReflectionClass___construct, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_ReflectionClass___toString arginfo_class_ReflectionFunction___toString
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_ReflectionClass_getFriendNames, 0, 0, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
 
 #define arginfo_class_ReflectionClass_getName arginfo_class_ReflectionFunctionAbstract_inNamespace
 
@@ -419,8 +422,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_class_ReflectionNamedType_isBuiltin arginfo_class_ReflectionFunctionAbstract_inNamespace
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_ReflectionUnionType_getTypes, 0, 0, IS_ARRAY, 0)
-ZEND_END_ARG_INFO()
+#define arginfo_class_ReflectionUnionType_getTypes arginfo_class_ReflectionClass_getFriendNames
 
 #define arginfo_class_ReflectionExtension___clone arginfo_class_ReflectionFunctionAbstract___clone
 
@@ -484,7 +486,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_class_ReflectionAttribute_isRepeated arginfo_class_ReflectionClass_isEnum
 
-#define arginfo_class_ReflectionAttribute_getArguments arginfo_class_ReflectionUnionType_getTypes
+#define arginfo_class_ReflectionAttribute_getArguments arginfo_class_ReflectionClass_getFriendNames
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_ReflectionAttribute_newInstance, 0, 0, IS_OBJECT, 0)
 ZEND_END_ARG_INFO()
@@ -503,7 +505,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_ReflectionEnum_getCase, 0, 
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ReflectionEnum_getCases arginfo_class_ReflectionUnionType_getTypes
+#define arginfo_class_ReflectionEnum_getCases arginfo_class_ReflectionClass_getFriendNames
 
 #define arginfo_class_ReflectionEnum_isBacked arginfo_class_ReflectionClass_isEnum
 
@@ -584,6 +586,7 @@ ZEND_METHOD(ReflectionMethod, getPrototype);
 ZEND_METHOD(ReflectionMethod, setAccessible);
 ZEND_METHOD(ReflectionClass, __construct);
 ZEND_METHOD(ReflectionClass, __toString);
+ZEND_METHOD(ReflectionClass, getFriendNames);
 ZEND_METHOD(ReflectionClass, getName);
 ZEND_METHOD(ReflectionClass, isInternal);
 ZEND_METHOD(ReflectionClass, isUserDefined);
@@ -835,6 +838,7 @@ static const zend_function_entry class_ReflectionClass_methods[] = {
 	ZEND_ME(ReflectionClass, __clone, arginfo_class_ReflectionClass___clone, ZEND_ACC_PRIVATE)
 	ZEND_ME(ReflectionClass, __construct, arginfo_class_ReflectionClass___construct, ZEND_ACC_PUBLIC)
 	ZEND_ME(ReflectionClass, __toString, arginfo_class_ReflectionClass___toString, ZEND_ACC_PUBLIC)
+	ZEND_ME(ReflectionClass, getFriendNames, arginfo_class_ReflectionClass_getFriendNames, ZEND_ACC_PUBLIC)
 	ZEND_ME(ReflectionClass, getName, arginfo_class_ReflectionClass_getName, ZEND_ACC_PUBLIC)
 	ZEND_ME(ReflectionClass, isInternal, arginfo_class_ReflectionClass_isInternal, ZEND_ACC_PUBLIC)
 	ZEND_ME(ReflectionClass, isUserDefined, arginfo_class_ReflectionClass_isUserDefined, ZEND_ACC_PUBLIC)

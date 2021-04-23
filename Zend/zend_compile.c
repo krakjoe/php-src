@@ -1885,6 +1885,8 @@ ZEND_API void zend_initialize_class_data(zend_class_entry *ce, bool nullify_hand
 	ce->attributes = NULL;
 	ce->enum_backing_type = IS_UNDEF;
 	ce->backed_enum_table = NULL;
+	ce->num_friends = 0;
+	ce->friends = NULL;
 
 	if (nullify_handlers) {
 		ce->constructor = NULL;
@@ -7484,6 +7486,38 @@ static void zend_compile_enum_backing_type(zend_class_entry *ce, zend_ast *enum_
 	zend_hash_init(ce->backed_enum_table, 0, NULL, ZVAL_PTR_DTOR, 0);
 }
 
+static void zend_compile_class_friends(zend_class_entry *ce, zend_ast *ast) {
+    uint32_t i;
+    zend_ast_list *list = zend_ast_get_list(ast);
+
+    zend_class_name *friends = emalloc(
+        sizeof(zend_class_name) * list->children);
+
+    for (i = 0; i < list->children; i++) {
+        zend_ast *class_ast = list->child[i];
+        friends[i].name = 
+            zend_resolve_const_class_name_reference(
+                class_ast, "class name");
+        friends[i].lc_name = zend_string_tolower(friends[i].name);
+
+        if (zend_string_equals_ci(ce->name, friends[i].lc_name)) {
+            zend_error_noreturn(E_COMPILE_ERROR,
+                "Class %s may not be friends with itself",
+                ZSTR_VAL(ce->name));
+        }
+
+        if (ce->parent_name &&
+            zend_string_equals_ci(ce->parent_name, friends[i].lc_name)) {
+            zend_error_noreturn(E_COMPILE_ERROR,
+                "Class %s may not be friends with parent %s",
+                ZSTR_VAL(ce->name), ZSTR_VAL(ce->parent_name));
+        }
+    }
+
+    ce->num_friends  = list->children;
+    ce->friends      = friends;
+}
+
 void zend_compile_class_decl(znode *result, zend_ast *ast, bool toplevel) /* {{{ */
 {
 	zend_ast_decl *decl = (zend_ast_decl *) ast;
@@ -7491,6 +7525,7 @@ void zend_compile_class_decl(znode *result, zend_ast *ast, bool toplevel) /* {{{
 	zend_ast *implements_ast = decl->child[1];
 	zend_ast *stmt_ast = decl->child[2];
 	zend_ast *enum_backing_type_ast = decl->child[4];
+	zend_ast *friends_ast = decl->child[5];
 	zend_string *name, *lcname;
 	zend_class_entry *ce = zend_arena_alloc(&CG(arena), sizeof(zend_class_entry));
 	zend_op *opline;
@@ -7559,6 +7594,10 @@ void zend_compile_class_decl(znode *result, zend_ast *ast, bool toplevel) /* {{{
 	if (extends_ast) {
 		ce->parent_name =
 			zend_resolve_const_class_name_reference(extends_ast, "class name");
+	}
+
+	if (friends_ast) {
+	    zend_compile_class_friends(ce, friends_ast);
 	}
 
 	CG(active_class_entry) = ce;

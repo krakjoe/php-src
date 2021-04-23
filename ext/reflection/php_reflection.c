@@ -4036,6 +4036,31 @@ ZEND_METHOD(ReflectionClass, __toString)
 }
 /* }}} */
 
+/* {{{ */
+ZEND_METHOD(ReflectionClass, getFriendNames)
+{
+    reflection_object *intern;
+	zend_class_entry *ce;
+    uint32_t i;
+    
+	if (zend_parse_parameters_none() == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	GET_REFLECTION_OBJECT_PTR(ce);
+
+	array_init(return_value);
+
+	for (i = 0; i < ce->num_friends; i++) {
+	    if (!ce->friends[i].name) {
+	        continue;
+	    }
+	    
+	    add_next_index_str(return_value, 
+	        zend_string_copy(ce->friends[i].name));
+	}
+} /* }}} */
+
 /* {{{ Returns the class' name */
 ZEND_METHOD(ReflectionClass, getName)
 {

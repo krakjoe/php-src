@@ -211,6 +211,9 @@ class ReflectionClass implements Reflector
 
     public function __toString(): string {}
 
+    /** @return array */
+    public function getFriendNames() : array {}
+
     /** @return string */
     public function getName() {}
 

@@ -115,7 +115,7 @@ ZEND_API zend_ast * ZEND_FASTCALL zend_ast_create_class_const_or_name(zend_ast *
 
 ZEND_API zend_ast *zend_ast_create_decl(
 	zend_ast_kind kind, uint32_t flags, uint32_t start_lineno, zend_string *doc_comment,
-	zend_string *name, zend_ast *child0, zend_ast *child1, zend_ast *child2, zend_ast *child3, zend_ast *child4
+	zend_string *name, zend_ast *child0, zend_ast *child1, zend_ast *child2, zend_ast *child3, zend_ast *child4, zend_ast *child5
 ) {
 	zend_ast_decl *ast;
 
@@ -133,6 +133,7 @@ ZEND_API zend_ast *zend_ast_create_decl(
 	ast->child[2] = child2;
 	ast->child[3] = child3;
 	ast->child[4] = child4;
+	ast->child[5] = child5;
 
 	return (zend_ast *) ast;
 }
