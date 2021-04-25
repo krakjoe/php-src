@@ -2721,3 +2721,114 @@ PHP_FUNCTION(sys_getloadavg)
 }
 /* }}} */
 #endif
+
+
+static int check_is_literal(zval *piece, int position)
+{
+	if (Z_TYPE_P(piece) != IS_STRING) {
+		zend_throw_exception_ex(
+				zend_ce_type_error,
+				0,
+				"Only literal strings allowed. Found bad type at position %d",
+				position
+		);
+		return -1;
+	}
+
+	if(!Z_IS_LITERAL(*piece)) {
+		zend_throw_exception_ex(
+			zend_ce_type_error,
+			0,
+			"Non-literal string found at position %d",
+			position
+		);
+		return -1;
+	}
+
+	return 0;
+}
+
+
+/* {{{ */
+PHP_FUNCTION(literal_combine)
+{
+	zval *piece;
+	zval *pieces;
+	int pieces_count = -1;
+
+	zval pieces_all;
+	int position = 0;
+	int ok;
+
+	array_init(&pieces_all);
+
+	ZEND_PARSE_PARAMETERS_START(1, -1)
+		Z_PARAM_ZVAL(piece)
+		Z_PARAM_VARIADIC('+', pieces, pieces_count)
+	ZEND_PARSE_PARAMETERS_END();
+
+	add_next_index_zval(&pieces_all, piece);
+
+	for (position = 0; position < pieces_count; position++) {
+		ok = check_is_literal(&pieces[position], position);
+		if (ok != 0) {
+			// Exception is set inside check_is_literal_int_or_bool
+			RETURN_THROWS();
+		}
+		add_next_index_zval(&pieces_all, &pieces[position]);
+	}
+
+	zend_string *glue = zend_string_init("", sizeof("") - 1, 0);
+	php_implode(glue, Z_ARRVAL(pieces_all), return_value);
+	Z_SET_IS_LITERAL_P(return_value);
+}
+/* }}} */
+
+
+/* {{{ */
+PHP_FUNCTION(literal_implode)
+{
+	zval *pieces;
+	zval *piece;
+
+	zval *glue;
+	int position = 0;
+	int ok;
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_ZVAL(glue)
+		Z_PARAM_ARRAY(pieces)
+	ZEND_PARSE_PARAMETERS_END();
+
+
+	if (!glue || Z_TYPE_P(glue) != IS_STRING) {
+	    zend_throw_exception(
+			zend_ce_type_error,
+			"glue must be literal string",
+			0
+		);
+		RETURN_THROWS();
+	}
+
+	if(!Z_IS_LITERAL_P(glue)) {
+		zend_throw_exception(
+			zend_ce_type_error,
+			"glue must be literal string",
+			0
+		);
+		RETURN_THROWS();
+	}
+
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(pieces), piece) {
+		ok = check_is_literal(piece, position);
+		if (ok != 0) {
+			// Exception is set inside check_is_literal_int_or_bool
+			RETURN_THROWS();
+		}
+		position += 1;
+	} ZEND_HASH_FOREACH_END();
+
+	php_implode(Z_STR_P(glue), Z_ARRVAL_P(pieces), return_value);
+	Z_SET_IS_LITERAL_P(return_value);
+}
+/* }}} */
