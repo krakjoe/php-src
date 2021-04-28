@@ -1556,6 +1556,7 @@ zend_object_iterator *date_object_period_get_iterator(zend_class_entry *ce, zval
 	return (zend_object_iterator*)iterator;
 } /* }}} */
 
+/* @TODO: remove this check and declare DateTimeInterface sealed, permitting only DateTime and DateTimeImmutable */
 static int implement_date_interface_handler(zend_class_entry *interface, zend_class_entry *implementor) /* {{{ */
 {
 	if (implementor->type == ZEND_USER_CLASS &&
