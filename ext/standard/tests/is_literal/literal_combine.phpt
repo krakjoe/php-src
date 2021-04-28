@@ -22,7 +22,7 @@ try {
     literal_combine($zok, $fot, $non_literal_string);
     echo "literal_combine failed to throw exception for non-literal string.\n";
 }
-catch (TypeError $e) {
+catch (LiteralStringRequiredError $e) {
     echo $e->getMessage(), "\n";
 }
 
@@ -31,7 +31,7 @@ try {
     literal_combine($zok, $fot, new StdClass);
     echo "literal_combine failed to throw exception for incorrect type.\n";
 }
-catch (TypeError $e) {
+catch (LiteralStringRequiredError $e) {
     echo $e->getMessage(), "\n";
 }
 

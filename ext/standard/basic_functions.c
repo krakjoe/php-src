@@ -126,6 +126,8 @@ static const zend_module_dep standard_deps[] = { /* {{{ */
 };
 /* }}} */
 
+PHPAPI zend_class_entry *literal_string_required_error_ce;
+
 zend_module_entry basic_functions_module = { /* {{{ */
 	STANDARD_MODULE_HEADER_EX,
 	NULL,
@@ -288,6 +290,7 @@ PHP_MINIT_FUNCTION(basic) /* {{{ */
 	php_register_incomplete_class_handlers();
 
 	assertion_error_ce = register_class_AssertionError(zend_ce_error);
+	literal_string_required_error_ce = register_class_LiteralStringRequiredError(zend_ce_error);
 
 	REGISTER_LONG_CONSTANT("CONNECTION_ABORTED", PHP_CONNECTION_ABORTED, CONST_CS | CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("CONNECTION_NORMAL",  PHP_CONNECTION_NORMAL,  CONST_CS | CONST_PERSISTENT);
@@ -2727,7 +2730,7 @@ static int check_is_literal(zval *piece, int position)
 {
 	if (Z_TYPE_P(piece) != IS_STRING) {
 		zend_throw_exception_ex(
-				zend_ce_type_error,
+				literal_string_required_error_ce,
 				0,
 				"Only literal strings allowed. Found bad type at position %d",
 				position
@@ -2737,7 +2740,7 @@ static int check_is_literal(zval *piece, int position)
 
 	if(!Z_IS_LITERAL(*piece)) {
 		zend_throw_exception_ex(
-			zend_ce_type_error,
+			literal_string_required_error_ce,
 			0,
 			"Non-literal string found at position %d",
 			position
@@ -2772,7 +2775,7 @@ PHP_FUNCTION(literal_combine)
 	for (position = 0; position < pieces_count; position++) {
 		ok = check_is_literal(&pieces[position], position);
 		if (ok != 0) {
-			// Exception is set inside check_is_literal_int_or_bool
+			// Exception is set inside check_is_literal
 			RETURN_THROWS();
 		}
 		add_next_index_zval(&pieces_all, &pieces[position]);
@@ -2803,7 +2806,7 @@ PHP_FUNCTION(literal_implode)
 
 	if (!glue || Z_TYPE_P(glue) != IS_STRING) {
 	    zend_throw_exception(
-			zend_ce_type_error,
+			literal_string_required_error_ce,
 			"glue must be literal string",
 			0
 		);
@@ -2812,7 +2815,7 @@ PHP_FUNCTION(literal_implode)
 
 	if(!Z_IS_LITERAL_P(glue)) {
 		zend_throw_exception(
-			zend_ce_type_error,
+			literal_string_required_error_ce,
 			"glue must be literal string",
 			0
 		);
@@ -2822,7 +2825,7 @@ PHP_FUNCTION(literal_implode)
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(pieces), piece) {
 		ok = check_is_literal(piece, position);
 		if (ok != 0) {
-			// Exception is set inside check_is_literal_int_or_bool
+			// Exception is set inside check_is_literal
 			RETURN_THROWS();
 		}
 		position += 1;

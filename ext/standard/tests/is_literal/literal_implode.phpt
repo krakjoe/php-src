@@ -43,7 +43,7 @@ try {
     $result = literal_implode($non_literal_string, $pieces);
     echo "literal_implode failed to throw exception for non-literal glue.\n";
 }
-catch(TypeError $e) {
+catch(LiteralStringRequiredError $e) {
     echo $e->getMessage(), "\n";
 }
 
@@ -54,7 +54,7 @@ try {
     $result = literal_implode($glue, $pieces);
     echo "literal_implode failed to throw exception for non-literal piece.\n";
 }
-catch(TypeError $e) {
+catch(LiteralStringRequiredError $e) {
     echo $e->getMessage(), "\n";
 }
 
