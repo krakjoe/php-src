@@ -1,26 +1,24 @@
 --TEST--
-Friendship Inheritance
+Reflection
 --FILE--
 <?php
-class A for B,C {}
+sealed class A permits B {}
 
 class B extends A {}
 
 foreach ([A::class, B::class] as $class) {
     $reflector = new ReflectionClass($class);
-    
-    var_dump($reflector->getFriendNames());
+
+    var_dump($reflector->isSealed());
+    var_dump($reflector->getPermittedClasses());
 }
 ?>
 --EXPECT--
-array(2) {
-  [0]=>
-  string(1) "B"
-  [1]=>
-  string(1) "C"
-}
+bool(true)
 array(1) {
   [0]=>
-  string(1) "C"
+  string(1) "B"
 }
-
+bool(false)
+array(0) {
+}
