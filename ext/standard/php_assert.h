@@ -24,5 +24,6 @@ PHP_RSHUTDOWN_FUNCTION(assert);
 PHP_MINFO_FUNCTION(assert);
 
 extern PHPAPI zend_class_entry *assertion_error_ce;
+extern PHPAPI zend_class_entry *assertion_error_ce;
 
 #endif /* PHP_ASSERT_H */

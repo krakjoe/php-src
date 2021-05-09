@@ -381,6 +381,14 @@ function config_get_hash(): array {}
 function sys_getloadavg(): array|false {}
 #endif
 
+function literal_implode(string $glue, array $pieces): string {}
+
+function literal_concat(string $piece, string ...$pieces): string {}
+
+class LiteralStringRequiredError extends TypeError
+{
+}
+
 /* browscap.c */
 
 function get_browser(?string $user_agent = null, bool $return_array = false): object|array|false {}
