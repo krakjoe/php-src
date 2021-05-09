@@ -383,7 +383,7 @@ function sys_getloadavg(): array|false {}
 
 function literal_implode(string $glue, array $pieces): string {}
 
-function literal_combine(string $piece, string ...$pieces): string {}
+function literal_concat(string $piece, string ...$pieces): string {}
 
 class LiteralStringRequiredError extends TypeError
 {

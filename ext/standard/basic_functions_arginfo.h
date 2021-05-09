@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 7d3e9ce542c1d3b5568ac2f7e47379d330e21970 */
+ * Stub hash: 6e4df4de64d77b517967061b93c1ba7334b1321d */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_set_time_limit, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, seconds, IS_LONG, 0)
@@ -593,7 +593,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_literal_implode, 0, 2, IS_STRING
 	ZEND_ARG_TYPE_INFO(0, pieces, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_literal_combine, 0, 1, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_literal_concat, 0, 1, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, piece, IS_STRING, 0)
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, pieces, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -2399,7 +2399,7 @@ ZEND_FUNCTION(config_get_hash);
 ZEND_FUNCTION(sys_getloadavg);
 #endif
 ZEND_FUNCTION(literal_implode);
-ZEND_FUNCTION(literal_combine);
+ZEND_FUNCTION(literal_concat);
 ZEND_FUNCTION(get_browser);
 ZEND_FUNCTION(crc32);
 ZEND_FUNCTION(crypt);
@@ -3029,7 +3029,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(sys_getloadavg, arginfo_sys_getloadavg)
 #endif
 	ZEND_FE(literal_implode, arginfo_literal_implode)
-	ZEND_FE(literal_combine, arginfo_literal_combine)
+	ZEND_FE(literal_concat, arginfo_literal_concat)
 	ZEND_FE(get_browser, arginfo_get_browser)
 	ZEND_FE(crc32, arginfo_crc32)
 	ZEND_FE(crypt, arginfo_crypt)

@@ -2753,7 +2753,7 @@ static int check_is_literal(zval *piece, int position)
 
 
 /* {{{ */
-PHP_FUNCTION(literal_combine)
+PHP_FUNCTION(literal_concat)
 {
 	zval *piece;
 	zval *pieces;
