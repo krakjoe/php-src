@@ -7038,8 +7038,6 @@ static zval *_reflection_write_property(zend_object *object, zend_string *name, 
 
 static void reflection_init_class_handlers(zend_class_entry *ce) {
 	ce->create_object = reflection_objects_new;
-	ce->serialize = zend_class_serialize_deny;
-	ce->unserialize = zend_class_unserialize_deny;
 }
 
 PHP_MINIT_FUNCTION(reflection) /* {{{ */
