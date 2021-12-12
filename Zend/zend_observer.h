@@ -27,10 +27,18 @@
 BEGIN_EXTERN_C()
 
 extern ZEND_API int zend_observer_fcall_op_array_extension;
+extern ZEND_API int zend_observer_features;
+
+#define ZEND_OBSERVE_STACK_DEPTH 1
+
+ZEND_API void zend_observer_feature_set(int features);
 
 #define ZEND_OBSERVER_ENABLED (zend_observer_fcall_op_array_extension != -1)
 
 #define ZEND_OBSERVER_FCALL_BEGIN(execute_data) do { \
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) { \
+			EG(depth)++; \
+		} \
 		if (ZEND_OBSERVER_ENABLED) { \
 			zend_observer_fcall_begin(execute_data); \
 		} \
@@ -39,6 +47,9 @@ extern ZEND_API int zend_observer_fcall_op_array_extension;
 #define ZEND_OBSERVER_FCALL_END(execute_data, return_value) do { \
 		if (ZEND_OBSERVER_ENABLED) { \
 			zend_observer_fcall_end(execute_data, return_value); \
+		} \
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) { \
+			EG(depth)--; \
 		} \
 	} while (0)
 

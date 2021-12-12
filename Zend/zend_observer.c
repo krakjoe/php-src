@@ -45,6 +45,7 @@ zend_llist zend_observer_fiber_switch;
 zend_llist zend_observer_fiber_destroy;
 
 int zend_observer_fcall_op_array_extension;
+int zend_observer_features;
 
 ZEND_TLS zend_arena *fcall_handlers_arena;
 ZEND_TLS zend_execute_data *first_observed_frame;
@@ -80,6 +81,11 @@ ZEND_API void zend_observer_startup(void) {
 	zend_llist_init(&zend_observer_fiber_destroy, sizeof(zend_observer_fiber_destroy_handler), NULL, 1);
 
 	zend_observer_fcall_op_array_extension = -1;
+	zend_observer_features = 0;
+}
+
+ZEND_API void zend_observer_feature_set(int features) {
+	zend_observer_features |= features;
 }
 
 ZEND_API void zend_observer_activate(void) {

@@ -1253,8 +1253,13 @@ static ZEND_VM_HOT ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_ICALL_SPEC_RETV
 	ret = 0 ? EX_VAR(opline->result.var) : &retval;
 	ZVAL_NULL(ret);
 
+	if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+		EG(depth)++;
+	}
 	fbc->internal_function.handler(call, ret);
-
+	if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+		EG(depth)--;
+	}
 #if ZEND_DEBUG
 	if (!EG(exception) && call->func) {
 		if (should_throw) {
@@ -1315,8 +1320,13 @@ static ZEND_VM_HOT ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_ICALL_SPEC_RETV
 	ret = 1 ? EX_VAR(opline->result.var) : &retval;
 	ZVAL_NULL(ret);
 
+	if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+		EG(depth)++;
+	}
 	fbc->internal_function.handler(call, ret);
-
+	if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+		EG(depth)--;
+	}
 #if ZEND_DEBUG
 	if (!EG(exception) && call->func) {
 		if (should_throw) {
@@ -1424,7 +1434,7 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_UCALL_SPEC_OBS
 	i_init_func_execute_data(&fbc->op_array, ret, 0 EXECUTE_DATA_CC);
 	LOAD_OPLINE_EX();
 	SAVE_OPLINE();
-	zend_observer_fcall_begin(execute_data);
+	ZEND_OBSERVER_FCALL_BEGIN(execute_data);
 
 	ZEND_VM_ENTER_EX();
 }
@@ -1480,9 +1490,13 @@ static ZEND_VM_HOT ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_BY_NAME_S
 
 		ret = 0 ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		fbc->internal_function.handler(call, ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -1575,9 +1589,13 @@ static ZEND_VM_HOT ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_BY_NAME_S
 
 		ret = 1 ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		fbc->internal_function.handler(call, ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -1640,7 +1658,7 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_BY_NAME_
 		i_init_func_execute_data(&fbc->op_array, ret, 0 EXECUTE_DATA_CC);
 		LOAD_OPLINE_EX();
 		SAVE_OPLINE();
-		zend_observer_fcall_begin(execute_data);
+		ZEND_OBSERVER_FCALL_BEGIN(execute_data);
 
 		ZEND_VM_ENTER_EX();
 	} else {
@@ -1671,9 +1689,13 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_BY_NAME_
 
 		ret = RETURN_VALUE_USED(opline) ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		fbc->internal_function.handler(call, ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -1777,13 +1799,18 @@ static ZEND_VM_HOT ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_SPEC_RETV
 		ret = 0 ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
 
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		if (!zend_execute_internal) {
 			/* saves one function call if zend_execute_internal is not used */
 			fbc->internal_function.handler(call, ret);
 		} else {
 			zend_execute_internal(call, ret);
 		}
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -1886,13 +1913,18 @@ static ZEND_VM_HOT ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_SPEC_RETV
 		ret = 1 ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
 
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		if (!zend_execute_internal) {
 			/* saves one function call if zend_execute_internal is not used */
 			fbc->internal_function.handler(call, ret);
 		} else {
 			zend_execute_internal(call, ret);
 		}
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -1956,11 +1988,11 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_SPEC_OBS
 		if (EXPECTED(zend_execute_ex == execute_ex)) {
 			LOAD_OPLINE_EX();
 			SAVE_OPLINE();
-			zend_observer_fcall_begin(execute_data);
+			ZEND_OBSERVER_FCALL_BEGIN(execute_data);
 			ZEND_VM_ENTER_EX();
 		} else {
 			SAVE_OPLINE_EX();
-			zend_observer_fcall_begin(execute_data);
+			ZEND_OBSERVER_FCALL_BEGIN(execute_data);
 			execute_data = EX(prev_execute_data);
 			LOAD_OPLINE();
 			ZEND_ADD_CALL_FLAG(call, ZEND_CALL_TOP);
@@ -1995,13 +2027,18 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_DO_FCALL_SPEC_OBS
 		ret = RETURN_VALUE_USED(opline) ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
 
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		if (!zend_execute_internal) {
 			/* saves one function call if zend_execute_internal is not used */
 			fbc->internal_function.handler(call, ret);
 		} else {
 			zend_execute_internal(call, ret);
 		}
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -3457,11 +3494,11 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_CALL_TRAMPOLINE_SPEC_OBSERVER_
 		if (EXPECTED(zend_execute_ex == execute_ex)) {
 			LOAD_OPLINE_EX();
 			SAVE_OPLINE();
-			zend_observer_fcall_begin(execute_data);
+			ZEND_OBSERVER_FCALL_BEGIN(execute_data);
 			ZEND_VM_ENTER_EX();
 		} else {
 			SAVE_OPLINE_EX();
-			zend_observer_fcall_begin(execute_data);
+			ZEND_OBSERVER_FCALL_BEGIN(execute_data);
 			execute_data = EX(prev_execute_data);
 			LOAD_OPLINE();
 			ZEND_ADD_CALL_FLAG(call, ZEND_CALL_TOP);
@@ -4346,7 +4383,7 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_RETURN_SPEC_OBSER
 		}
 	}
 	SAVE_OPLINE();
-	zend_observer_fcall_end(execute_data, return_value);
+	ZEND_OBSERVER_FCALL_END(execute_data, return_value);
 	if (return_value == &observer_retval) { zval_ptr_dtor_nogc(&observer_retval); };
 	ZEND_VM_TAIL_CALL(zend_leave_helper_SPEC(ZEND_OPCODE_HANDLER_ARGS_PASSTHRU));
 }
@@ -4475,7 +4512,7 @@ static ZEND_VM_COLD ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_RETURN_BY_REF_SPE
 		FREE_OP(opline->op1_type, opline->op1.var);
 	} while (0);
 
-	zend_observer_fcall_end(execute_data, return_value);
+	ZEND_OBSERVER_FCALL_END(execute_data, return_value);
 	if (return_value == &observer_retval) { zval_ptr_dtor_nogc(&observer_retval); };
 	ZEND_VM_TAIL_CALL(zend_leave_helper_SPEC(ZEND_OPCODE_HANDLER_ARGS_PASSTHRU));
 }
@@ -4559,7 +4596,7 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_GENERATOR_RETURN_SPEC_OBSERVER
 		}
 	}
 
-	zend_observer_fcall_end(generator->execute_data, &generator->retval);
+	ZEND_OBSERVER_FCALL_END(generator->execute_data, &generator->retval);
 
 	/* Close the generator to free up resources */
 	zend_generator_close(generator, 1);
@@ -4971,7 +5008,7 @@ static ZEND_OPCODE_HANDLER_RET ZEND_FASTCALL ZEND_INCLUDE_OR_EVAL_SPEC_OBSERVER_
 
 		call->prev_execute_data = execute_data;
 		i_init_code_execute_data(call, new_op_array, return_value);
-		zend_observer_fcall_begin(call);
+		ZEND_OBSERVER_FCALL_BEGIN(call);
 		if (EXPECTED(zend_execute_ex == execute_ex)) {
 			FREE_OP(opline->op1_type, opline->op1.var);
 			ZEND_VM_ENTER();
@@ -56033,7 +56070,7 @@ zend_leave_helper_SPEC_LABEL:
 		}
 	}
 	SAVE_OPLINE();
-	zend_observer_fcall_end(execute_data, return_value);
+	ZEND_OBSERVER_FCALL_END(execute_data, return_value);
 	if (return_value == &observer_retval) { zval_ptr_dtor_nogc(&observer_retval); };
 	goto zend_leave_helper_SPEC_LABEL;
 }

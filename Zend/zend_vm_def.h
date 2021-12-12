@@ -3968,8 +3968,13 @@ ZEND_VM_HOT_HANDLER(129, ZEND_DO_ICALL, ANY, ANY, SPEC(RETVAL))
 	ret = RETURN_VALUE_USED(opline) ? EX_VAR(opline->result.var) : &retval;
 	ZVAL_NULL(ret);
 
+	if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+		EG(depth)++;
+	}
 	fbc->internal_function.handler(call, ret);
-
+	if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+		EG(depth)--;
+	}
 #if ZEND_DEBUG
 	if (!EG(exception) && call->func) {
 		if (should_throw) {
@@ -4086,9 +4091,13 @@ ZEND_VM_HOT_HANDLER(131, ZEND_DO_FCALL_BY_NAME, ANY, ANY, SPEC(RETVAL,OBSERVER))
 
 		ret = RETURN_VALUE_USED(opline) ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		fbc->internal_function.handler(call, ret);
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {
@@ -4192,13 +4201,18 @@ ZEND_VM_HOT_HANDLER(60, ZEND_DO_FCALL, ANY, ANY, SPEC(RETVAL,OBSERVER))
 		ret = RETURN_VALUE_USED(opline) ? EX_VAR(opline->result.var) : &retval;
 		ZVAL_NULL(ret);
 
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)++;
+		}
 		if (!zend_execute_internal) {
 			/* saves one function call if zend_execute_internal is not used */
 			fbc->internal_function.handler(call, ret);
 		} else {
 			zend_execute_internal(call, ret);
 		}
-
+		if (UNEXPECTED(zend_observer_features & ZEND_OBSERVE_STACK_DEPTH)) {
+			EG(depth)--;
+		}
 #if ZEND_DEBUG
 		if (!EG(exception) && call->func) {
 			if (should_throw) {

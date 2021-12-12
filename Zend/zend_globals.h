@@ -266,6 +266,9 @@ struct _zend_executor_globals {
 	uint32_t num_errors;
 	zend_error_info **errors;
 
+	/* If ZEND_OBSERVE_STACK_DEPTH is set in zend_observer_features */
+	uint32_t depth;
+
 	void *reserved[ZEND_MAX_RESERVED_RESOURCES];
 };
 

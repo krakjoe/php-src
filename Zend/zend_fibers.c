@@ -89,6 +89,7 @@ typedef struct _zend_fiber_vm_state {
 	uint32_t jit_trace_num;
 	JMP_BUF *bailout;
 	zend_fiber *active_fiber;
+	uint32_t depth;
 } zend_fiber_vm_state;
 
 static zend_always_inline void zend_fiber_capture_vm_state(zend_fiber_vm_state *state)
@@ -102,6 +103,7 @@ static zend_always_inline void zend_fiber_capture_vm_state(zend_fiber_vm_state *
 	state->jit_trace_num = EG(jit_trace_num);
 	state->bailout = EG(bailout);
 	state->active_fiber = EG(active_fiber);
+	state->depth = EG(depth);
 }
 
 static zend_always_inline void zend_fiber_restore_vm_state(zend_fiber_vm_state *state)
@@ -115,6 +117,7 @@ static zend_always_inline void zend_fiber_restore_vm_state(zend_fiber_vm_state *
 	EG(jit_trace_num) = state->jit_trace_num;
 	EG(bailout) = state->bailout;
 	EG(active_fiber) = state->active_fiber;
+	EG(depth) = state->depth;
 }
 
 #ifdef ZEND_FIBER_UCONTEXT

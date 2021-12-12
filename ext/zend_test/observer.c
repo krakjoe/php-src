@@ -82,6 +82,10 @@ static void observer_begin(zend_execute_data *execute_data)
 	} else {
 		php_printf("%*s<file '%s'>\n", 2 * ZT_G(observer_nesting_depth), "", ZSTR_VAL(execute_data->func->op_array.filename));
 	}
+	if (zend_observer_features & ZEND_OBSERVE_STACK_DEPTH) {
+		php_printf("%*s<depth %d>\n", 2 * EG(depth), "", EG(depth));
+	}
+	
 	ZT_G(observer_nesting_depth)++;
 	observer_show_opcode(execute_data);
 }
@@ -291,6 +295,7 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("zend_test.observer.fiber_init", "0", PHP_INI_SYSTEM, OnUpdateBool, observer_fiber_init, zend_zend_test_globals, zend_test_globals)
 	STD_PHP_INI_BOOLEAN("zend_test.observer.fiber_switch", "0", PHP_INI_SYSTEM, OnUpdateBool, observer_fiber_switch, zend_zend_test_globals, zend_test_globals)
 	STD_PHP_INI_BOOLEAN("zend_test.observer.fiber_destroy", "0", PHP_INI_SYSTEM, OnUpdateBool, observer_fiber_destroy, zend_zend_test_globals, zend_test_globals)
+	STD_PHP_INI_BOOLEAN("zend_test.observer.features.stack_depth", "0", PHP_INI_SYSTEM, OnUpdateBool, observer_features_stack_depth, zend_zend_test_globals, zend_test_globals)
 PHP_INI_END()
 
 void zend_test_observer_init(INIT_FUNC_ARGS)
@@ -315,6 +320,10 @@ void zend_test_observer_init(INIT_FUNC_ARGS)
 		zend_observer_fiber_switch_register(fiber_enter_observer);
 		zend_observer_fiber_switch_register(fiber_suspend_observer);
 		zend_observer_fiber_destroy_register(fiber_destroy_observer);
+	}
+
+	if (ZT_G(observer_features_stack_depth)) {
+		zend_observer_feature_set(ZEND_OBSERVE_STACK_DEPTH);
 	}
 }
 

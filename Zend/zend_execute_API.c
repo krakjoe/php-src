@@ -195,6 +195,7 @@ void init_executor(void) /* {{{ */
 	zend_fiber_init();
 	zend_weakrefs_init();
 
+	EG(depth) = 0;
 	EG(active) = 1;
 }
 /* }}} */
